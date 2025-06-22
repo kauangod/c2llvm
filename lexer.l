@@ -38,8 +38,9 @@
 "{"              {return B_LEFT;}
 "}"              {return B_RIGHT;}
 ","              {return COMMA;}
+"&"              {return '&';}
 "'\\n'"          {yylval.character = '\n'; return CHARACTER;}
-(['"])[\x00-\x7F]\1   {yylval.character = yytext[1]; return CHARACTER;}
+"'"[\x0-\x7f]"'"   {yylval.character = yytext[1]; return CHARACTER;}
 \"[^"]*\"        {yylval.name = process_string(yytext); return STRING; }
 
 [a-zA-Z_][a-zA-Z_0-9]{0,9} {yylval.name = strdup(yytext); return ID; } /* Máximo de 10 caracteres para o identificador, o dup retorna o ponteiro para a string. */

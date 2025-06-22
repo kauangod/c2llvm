@@ -5,6 +5,9 @@ entry:
 	%var3 = alloca i32, align 4
 	%var4 = alloca float, align 4
 	%var5 = alloca i32, align 4
+	%var6 = alloca i32, align 4
+	%var7 = alloca float, align 4
+	%var8 = alloca i8, align 1
 	%0 = fadd float 0.0, 2.000000
 	%1 = fadd float 0.0, 2.500000
 	%2 = fmul float %0, %1
@@ -65,8 +68,27 @@ Label4:
 	%32 = call i32 (ptr, ...) @printf(ptr noundef @.str.3, i32 noundef %31)
 	%33 = load i32, i32* %var2, align 4
 	%34 = call i32 (ptr, ...) @printf(ptr noundef @.str.4, i32 noundef %33)
-	%35 = load i32, i32* %var5, align 4
-	ret i32 %35
+	%35 = add i8 0, 97
+	%36 = add i8 0, 1
+	%37 = add i8 %35, %36
+	store i8 %37, ptr %var1, align 1;
+	%38 = load i8, i8* %var1, align 1
+	%39 = sext i8 %38 to i32
+%40 = call i32 (ptr, ...) @printf(ptr noundef @.str.5, i32 noundef %39)
+	%41 = load i32, i32* %var3, align 4
+	%42 = call i32 (ptr, ...) @printf(ptr noundef @.str.6, i32 noundef %41)
+	%43 = load float, float* %var4, align 4
+	%44 = fpext float %43 to double
+%45 = call i32 (ptr, ...) @printf(ptr noundef @.str.7, double noundef %44)
+	%46 = load i32, i32* %var5, align 4
+	%47 = call i32 (ptr, ...) @printf(ptr noundef @.str.8, i32 noundef %46)
+	%48 = load i32, i32* %var2, align 4
+	%49 = call i32 (ptr, ...) @printf(ptr noundef @.str.9, i32 noundef %48)
+	%50 = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str, ptr noundef %6)
+	%51 = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str, ptr noundef %7)
+	%52 = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str, ptr noundef %8)
+	%53 = load i32, i32* %var5, align 4
+	ret i32 %53
 
 }
 
@@ -74,6 +96,9 @@ Label4:
 
 
 declare i32 @printf(ptr noundef, ...) #1
+
+
+declare i32 @__isoc99_scanf(ptr noundef, ...) #1
 attributes #0 = { noinline nounwind optnone sspstrong uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 @.str.0 = private unnamed_addr constant [15 x i8] c"testeChar: %c\0A\00", align 1
@@ -81,3 +106,8 @@ attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protect
 @.str.2 = private unnamed_addr constant [12 x i8] c"testeF: %f\0A\00", align 1
 @.str.3 = private unnamed_addr constant [12 x i8] c"result: %d\0A\00", align 1
 @.str.4 = private unnamed_addr constant [7 x i8] c"i: %d\0A\00", align 1
+@.str.5 = private unnamed_addr constant [15 x i8] c"testeChar: %c\0A\00", align 1
+@.str.6 = private unnamed_addr constant [14 x i8] c"testeVar: %d\0A\00", align 1
+@.str.7 = private unnamed_addr constant [12 x i8] c"testeF: %f\0A\00", align 1
+@.str.8 = private unnamed_addr constant [12 x i8] c"result: %d\0A\00", align 1
+@.str.9 = private unnamed_addr constant [7 x i8] c"i: %d\0A\00", align 1

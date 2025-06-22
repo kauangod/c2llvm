@@ -1,44 +1,47 @@
-char testeChar
-int i
-int testeVar
-float testeF
-int result
-testeF = 2 * 2.5
-testeChar = 'a'
+char testeChar;
+int i;
+int testeVar;
+float testeF;
+int result;
+int testeScan;
+float testeScan1;
+char testeScan2;
+testeF = 2 * 2.5;
+testeChar = 'a';
 
 if (testeF > 3) {
-  testeVar = 10
+  testeVar = 10;
 }
 else {
   testeVar = 3;
 }
 
-i = 0
-result = 1
+i = 0;
+result = 1;
 
 while ( i < testeVar ) {
-  result = result * 2
-  i = i + 1
+  result = result * 2;
+  i = i + 1;
 }
 
-testeChar = 'a' + 1
+testeChar = 'a' + 1;
 
-printf("testeChar: %c\n", testeChar)
-printf("testeVar: %d\n", testeVar)
-printf("testeF: %f\n", testeF)
-printf("result: %d\n", result)
-printf("i: %d\n", i)
-
-
-testeChar = 'a' + 1
-
-printf("testeChar: %c\n", testeChar)
-printf("testeVar: %d\n", testeVar)
-printf("testeF: %f\n", testeF)
-printf("result: %d\n", result)
-printf("i: %d\n", i)
+printf("testeChar: %c\n", testeChar);
+printf("testeVar: %d\n", testeVar);
+printf("testeF: %f\n", testeF);
+printf("result: %d\n", result);
+printf("i: %d\n", i);
 
 
+testeChar = 'a' + 1;
 
+printf("testeChar: %c\n", testeChar);
+printf("testeVar: %d\n", testeVar);
+printf("testeF: %f\n", testeF);
+printf("result: %d\n", result);
+printf("i: %d\n", i);
+scanf("%d", &testeScan);
+scanf("%f", &testeScan1);
+scanf("%c", &testeScan2);
 
 return result;
