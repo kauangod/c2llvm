@@ -1,10 +1,12 @@
+char testeChar
 int i
 int testeVar
 float testeF
 int result
 testeF = 2 * 2.5
+testeChar = 'a'
 
-if (testeF < 3) {
+if (testeF > 3) {
   testeVar = 10
 }
 else {
@@ -12,12 +14,21 @@ else {
 }
 
 i = 0
-result = 3
+result = 1
 
 while ( i < testeVar ) {
-  result = result * 3
+  result = result * 2 
   i = i + 1
 }
+
+testeChar = 'a' + 1
+
+printf("testeChar: %c\n", testeChar)
+printf("testeVar: %d\n", testeVar)
+printf("testeF: %f\n", testeF)
+printf("result: %d\n", result)
+printf("i: %d\n", i)
+
 
 
 

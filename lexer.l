@@ -14,7 +14,7 @@
 "float"          {return FLOATtype;}
 "boolean"        {return BOOLEANtype;}
 "char"           {return CHARtype;}
-"write"          {return writeCommand;}
+"printf"          {return writeCommand;}
 "read"           {return readCommand;}
 "return"         {return returnCommand;}
 "+"              {return PLUS;}
@@ -37,6 +37,7 @@
 "while"          {return WHILE;}
 "{"              {return B_LEFT;}
 "}"              {return B_RIGHT;}
+","              {return COMMA;}
 "'\\n'"          {yylval.character = '\n'; return CHARACTER;}
 "'"[\x0-\x7f]"'" {yylval.character = yytext[1]; return CHARACTER;}
 \"[^"]*\"        {yylval.name = process_string(yytext); return STRING; }

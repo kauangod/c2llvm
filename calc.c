@@ -117,7 +117,7 @@ void declareVariableAtTable(ht *hash, char *name, Types type) {
   }
   Symbol *symb = malloc(sizeof(Symbol));
   symb->Type = type;
-  symb->index = hash->length+1;
+  symb->index = hash->length + 1;
   ht_set(hash, name, symb);
   free(name);
 }
@@ -235,26 +235,32 @@ void printTempSymbTable(TempSymb *table, int max) {
   }
 }
 
-void printTempSymbTableToFile(FILE *file, TempSymb *table, int max, int identation, Types type) {
+void printTempSymbTableToFile(FILE *file, TempSymb *table, int max,
+                              int identation, Types type) {
   for (int i = 0; i < max; i++) {
     switch (table[i].op) {
     case OP_EQUAL:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       switch (type) {
       case Float:
-        fprintf(file, "%s = fadd float 0.0, %f\n", table[i].result, table[i].arg1);
+        fprintf(file, "%s = fadd float 0.0, %f\n", table[i].result,
+                table[i].arg1);
         break;
       case Int:
-        fprintf(file, "%s = add i32 0, %d\n", table[i].result, (int) table[i].arg1);
+        fprintf(file, "%s = add i32 0, %d\n", table[i].result,
+                (int)table[i].arg1);
         break;
       case Char:
-        fprintf(file, "%s = add i8 0, %d\n", table[i].result, (int) table[i].arg1);
+        fprintf(file, "%s = add i8 0, %d\n", table[i].result,
+                (int)table[i].arg1);
       default:
         break;
       }
       break;
     case OP_MULT:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       switch (type) {
       case Float:
         fprintf(file, "%s = fmul float %s, %s\n", table[i].result,
@@ -275,7 +281,8 @@ void printTempSymbTableToFile(FILE *file, TempSymb *table, int max, int identati
       }
       break;
     case OP_DIV:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       switch (type) {
       case Float:
         fprintf(file, "%s = fdiv float %s, %s\n", table[i].result,
@@ -296,7 +303,8 @@ void printTempSymbTableToFile(FILE *file, TempSymb *table, int max, int identati
       }
       break;
     case OP_PLUS:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       switch (type) {
       case Float:
         fprintf(file, "%s = fadd float %s, %s\n", table[i].result,
@@ -317,7 +325,8 @@ void printTempSymbTableToFile(FILE *file, TempSymb *table, int max, int identati
       }
       break;
     case OP_MINUS:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       switch (type) {
       case Float:
         fprintf(file, "%s = fsub float %s, %s\n", table[i].result,
@@ -338,7 +347,8 @@ void printTempSymbTableToFile(FILE *file, TempSymb *table, int max, int identati
       }
       break;
     case OP_VAR:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       switch (type) {
       case Float:
         fprintf(file, "%s = load float, float* %s, align 4\n", table[i].result,
@@ -356,7 +366,8 @@ void printTempSymbTableToFile(FILE *file, TempSymb *table, int max, int identati
       }
       break;
     case OP_L_EQUAL:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       switch (type) {
       case Float:
         fprintf(file, "%s = icmp eq float %s, %s\n", table[i].result,
@@ -377,19 +388,22 @@ void printTempSymbTableToFile(FILE *file, TempSymb *table, int max, int identati
       }
       break;
     case OP_AND:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       fprintf(file, "%s = %s && %s;\n", table[i].result,
               table[(int)table[i].arg1].result,
               table[(int)table[i].arg2].result);
       break;
     case OP_OR:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       fprintf(file, "%s = %s || %s;\n", table[i].result,
               table[(int)table[i].arg1].result,
               table[(int)table[i].arg2].result);
       break;
     case OP_DIF:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       switch (type) {
       case Float:
         fprintf(file, "%s = icmp ne float %s, %s\n", table[i].result,
@@ -410,7 +424,8 @@ void printTempSymbTableToFile(FILE *file, TempSymb *table, int max, int identati
       }
       break;
     case OP_GT:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       switch (type) {
       case Float:
         fprintf(file, "%s = icmp sgt float %s, %s\n", table[i].result,
@@ -431,7 +446,8 @@ void printTempSymbTableToFile(FILE *file, TempSymb *table, int max, int identati
       }
       break;
     case OP_GE:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       switch (type) {
       case Float:
         fprintf(file, "%s = icmp sge float %s, %s\n", table[i].result,
@@ -452,7 +468,8 @@ void printTempSymbTableToFile(FILE *file, TempSymb *table, int max, int identati
       }
       break;
     case OP_LT:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       switch (type) {
       case Float:
         fprintf(file, "%s = icmp slt float %s, %s\n", table[i].result,
@@ -473,7 +490,8 @@ void printTempSymbTableToFile(FILE *file, TempSymb *table, int max, int identati
       }
       break;
     case OP_LE:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       switch (type) {
       case Float:
         fprintf(file, "%s = icmp sle float %s, %s\n", table[i].result,
@@ -494,7 +512,8 @@ void printTempSymbTableToFile(FILE *file, TempSymb *table, int max, int identati
       }
       break;
     case OP_NOT:
-      for(int i =0; i < identation; i++) fprintf(file, "\t");
+      for (int i = 0; i < identation; i++)
+        fprintf(file, "\t");
       switch (type) {
       case Float:
         fprintf(file, "%s = icmp ne float %s, 0\n", table[i].result,
@@ -515,9 +534,10 @@ void printTempSymbTableToFile(FILE *file, TempSymb *table, int max, int identati
   }
 }
 
-char* tempSymbTableToString(TempSymb *table, int max) {
-  if (max <= 0) return NULL;
-  char* buffer = (char*) malloc(max * 128 * sizeof(char));
+char *tempSymbTableToString(TempSymb *table, int max) {
+  if (max <= 0)
+    return NULL;
+  char *buffer = (char *)malloc(max * 128 * sizeof(char));
   for (int i = 0; i < max; i++) {
     switch (table[i].op) {
     case OP_EQUAL:
@@ -551,4 +571,67 @@ char* tempSymbTableToString(TempSymb *table, int max) {
     }
   }
   return buffer;
+}
+
+Types parseString(const char *string, String *result) {
+  size_t old_len = strlen(string);
+  size_t count = 0;
+
+  // First, count how many times "old" appears in "source"
+  const char *pos = string;
+  while ((pos = strstr(pos, "\n")) != NULL) {
+    count++;
+    pos += old_len;
+  }
+
+  // Allocate enough space for new string
+  size_t new_size = strlen(string) + (count+1) * 3;
+  result->data = malloc(new_size);
+  result->size = strlen(string)  + 1;
+  if (!result->data)
+    return TypeError;
+
+  char *dst = result->data;
+  pos = string;
+
+  while (*pos) {
+    const char *match = strstr(pos, "\n");
+    if (match) {
+      // Copy up to match
+      size_t len = match - pos;
+      memcpy(dst, pos, len);
+      dst += len;
+
+      // Copy replacement string
+      memcpy(dst, "\\0A", 3);
+      dst += 3;
+
+      pos = match + 1;
+    } else {
+      // No more matches, copy the rest
+      strcpy(dst, pos);
+      break;
+    }
+  }
+  int size = strlen(result->data);
+  result->data[size] = '\\';
+  result->data[size+1] = '0';
+  result->data[size+2] = '0';
+  result->data[size+3] = '\0';
+
+  pos = string;
+
+  const char *match = strstr(pos, "%d");
+  if (match) {
+    return Int;
+  }
+  match = strstr(pos, "%f");
+  if (match) {
+    return Float;
+  }
+  match = strstr(pos, "%c");
+  if (match) {
+    return Char;
+  }
+  return TypeError;
 }

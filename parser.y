@@ -13,6 +13,8 @@ void yyerror(const char* str);
 FILE *fptr;
 ht* hashTable;
 TempSymb tabelaTemp[100];
+String stringsEstaticas[128];
+int stringsCount = 0;
 int lastTemp = 0;
 int tempCounter = 0;
 char str_num[32];
@@ -37,6 +39,7 @@ int indentation = 1;
 %token TIMES
 %token LEFT
 %token RIGHT
+%token DONE
 %token <name> ID
 %token <name> STRING
 %token EQUALS
@@ -51,6 +54,7 @@ int indentation = 1;
 %token NOT
 %token B_LEFT
 %token B_RIGHT
+%token COMMA
 %token IF
 %token ELSE
 %token WHILE
@@ -125,14 +129,14 @@ while_command:
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br i1 %%%d, label %%Label%d, label %%Label%d\n", lastTemp-1 + tempCounter, lastLabel+1, lastLabel);
       tempCounter += lastTemp;
-      lastTemp = 0;
+      lastTemp = 0; 
       pilePush(labelStack, lastLabel);
       lastLabel++;
       fprintf(fptr, "Label%d:\n", lastLabel++);
       indentation++;
       } B_LEFT commands {// printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation);
       tempCounter += lastTemp;
-      lastTemp = 0;
+      lastTemp = 0; 
       indentation--;
       } B_RIGHT {
       int temp = (int) popPile(labelStack);
@@ -180,38 +184,61 @@ write_command:
 ;
 
 write_value:
-      ID {
-        Symbol symb = getSymbolTableValue(hashTable, $1);
-        if(symb.Type == Int)
-          printf("%s is an int and equals to %d\n", $1, symb.value.intValue);
-        else if(symb.Type == Float)
-          printf("%s is an float and equals to %f\n", $1, symb.value.doubleValue);
-        else if(symb.Type == Char)
-          printf("%s is an char and equals to %c\n", $1, symb.value.charValue);
-        else if(symb.Type == Bool)
-          printf("%s is an boolean and equals to %s\n", $1, symb.value.intValue ? "True":"False");
-        free($1);
+      STRING COMMA write_formats {
+      String temp;
+      Types type = parseString($1, &temp);
+      printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation, type);
+      for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
+
+      switch (type) {
+        case Float:
+        fprintf(fptr, "%%%d = fpext float %s to double\n", tempCounter + lastTemp, tabelaTemp[lastTemp-1].result);
+        tempCounter++;
+        fprintf(fptr, "%%%d = call i32 (ptr, ...) @printf(ptr noundef @.str.%d, double noundef %%%d)\n", tempCounter + lastTemp, stringsCount, tempCounter + lastTemp - 1);
+        break;
+        case Int:
+        fprintf(fptr, "%%%d = call i32 (ptr, ...) @printf(ptr noundef @.str.%d, i32 noundef %s)\n", tempCounter + lastTemp, stringsCount, tabelaTemp[lastTemp-1].result);
+        break;
+        case Char:
+        fprintf(fptr, "%%%d = sext i8 %s to i32\n", tempCounter + lastTemp, tabelaTemp[lastTemp-1].result);
+        tempCounter++;
+        fprintf(fptr, "%%%d = call i32 (ptr, ...) @printf(ptr noundef @.str.%d, i32 noundef %%%d)\n", tempCounter + lastTemp, stringsCount, tempCounter + lastTemp - 1);
+        break;
+        case TypeError:
+        printf("Má formatação no printf.\nEncerrando Compilação sem exito.\n");
+        exit(EXIT_FAILURE);
+        break;
       }
-    | INT {
-      printf("%d", $1);
-    }
-    | DOUBLE {
-      printf("%f",$1);
+      stringsEstaticas[stringsCount] = temp;
+      stringsCount++;
+      tempCounter++;
+      tempCounter += lastTemp;
+      lastTemp = 0;
     }
     | STRING {
-      printf("%s",$1);
-      free($1);
-    }
-    | CHARACTER {
-      printf("%c",$1);
+      for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
+      fprintf(fptr, "%%%d = call i32 (ptr, ...) @printf(ptr noundef @.str.%d)\n", tempCounter + lastTemp, stringsCount);
+      String temp;
+      Types type = parseString($1, &temp);
+      if (type != TypeError) {
+        printf("Má formatação no printf.\nEncerrando Compilação sem exito.\n");
+        exit(EXIT_FAILURE);
+      }
+      stringsEstaticas[stringsCount] = temp;
+      stringsCount++;
+      tempCounter++;
     }
 ;
+
+write_formats:
+        expr {
+        }
 
 atrib:
       ID EQUALS expr {
       printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation, getSymbolTableValue(hashTable, $1).Type);
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
-
+      
       switch (getSymbolTableValue(hashTable, $1).Type) {
       case Float:
         fprintf(fptr, "store float %s, ptr %%var%d, align 4;\n", tabelaTemp[lastTemp-1].result, getSymbolTableValue(hashTable, $1).index);
@@ -227,7 +254,6 @@ atrib:
       tempCounter += lastTemp;
       lastTemp = 0;
     }
-    | ID EQUALS CHARACTER {assignCharValue(hashTable, $1, $3);}
 ;
 
 if_command:
@@ -236,14 +262,14 @@ if_command:
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br i1 %%%d, label %%Label%d, label %%Label%d\n", lastTemp-1 + tempCounter, lastLabel+1, lastLabel);
       tempCounter += lastTemp;
-      lastTemp = 0;
+      lastTemp = 0; 
       pilePush(labelStack, lastLabel);
       lastLabel++;
       fprintf(fptr, "Label%d:\n", lastLabel++);
       indentation++;
       } B_LEFT commands {// printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation);
       tempCounter += lastTemp;
-      lastTemp = 0;
+      lastTemp = 0; 
       indentation--;
       } B_RIGHT  else_command
 ;
@@ -326,6 +352,14 @@ factor:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
     }
+    | CHARACTER {$$ = lastTemp;
+      tabelaTemp[lastTemp].op = OP_EQUAL;
+      tabelaTemp[lastTemp].arg1 = $1;
+      tabelaTemp[lastTemp].arg2 = 0;
+      sprintf(str_num, "%%%d", lastTemp + tempCounter);
+      strcpy(tabelaTemp[lastTemp].result, str_num);
+      lastTemp++;
+    }
     | ID {
       $$ = lastTemp;
       tabelaTemp[lastTemp].op = OP_VAR;
@@ -336,10 +370,7 @@ factor:
       sprintf(str_num, "%%%d", lastTemp + tempCounter);
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
-        Symbol symb = getSymbolTableValue(hashTable, $1);
-        if(symb.Type == Char)
-          printf("deu merda filho\n");
-        free($1);
+      free($1);
       }
     | LEFT expr RIGHT {$$ = $2;}
 ;
@@ -360,7 +391,7 @@ logical_operations:
       sprintf(str_num, "%%%d", lastTemp + tempCounter);
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
-      }
+      } 
     | logical_operations GT expr {$$ = lastTemp;
       tabelaTemp[lastTemp].op = OP_GT;
       tabelaTemp[lastTemp].arg1 = $1;
@@ -368,7 +399,7 @@ logical_operations:
       sprintf(str_num, "%%%d", lastTemp + tempCounter);
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
-      }
+      } 
     | logical_operations GE expr  {$$ = lastTemp;
       tabelaTemp[lastTemp].op = OP_GE;
       tabelaTemp[lastTemp].arg1 = $1;
@@ -384,7 +415,7 @@ logical_operations:
       sprintf(str_num, "%%%d", lastTemp + tempCounter);
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
-      }
+      } 
     | logical_operations LE expr  {$$ = lastTemp;
       tabelaTemp[lastTemp].op = OP_LE;
       tabelaTemp[lastTemp].arg1 = $1;
@@ -426,7 +457,7 @@ logical_operations:
       lastTemp++;
     }
     | expr {$$ = $1;}
-;
+;   
 %%
 
 int yywrap( ) {
@@ -453,21 +484,21 @@ int main(int argc, char *argv[]) {
 
 
   // Open a file in writing mode
-  fptr = fopen("saida.txt", "w");
+  fptr = fopen("saida.ll", "w");
 
-  int c;
-  while ((c = fgetc(yyin)) != EOF)
-  {
-      fputc(c, fptr);
-  }
-  fputc('\n', fptr);
+  // int c; copiar conteudo do codigo fonte para a saida.
+  // while ((c = fgetc(yyin)) != EOF)
+  // {
+  //     fputc(c, fptr);
+  // }
+  // fputc('\n', fptr);
 
-  fclose(yyin);
-  yyin = fopen(argv[1], "r");
-  if (yyin == NULL) {
-      fprintf(stderr, "Error opening file `%s`\n", argv[1]);
-      return 1;
-  }
+  // fclose(yyin);
+  // yyin = fopen(argv[1], "r");
+  // if (yyin == NULL) {
+  //     fprintf(stderr, "Error opening file `%s`\n", argv[1]);
+  //     return 1;
+  // }
 
   // Write some text to the file
   fprintf(fptr,"define i32 @main() {\nentry:\n");
@@ -475,6 +506,8 @@ int main(int argc, char *argv[]) {
   labelStack = createPile();
   hashTable = ht_create();
   yyparse();
+
+
   hti it = ht_iterator(hashTable);
   while (ht_next(&it)) {
     if (it.value) {
@@ -486,9 +519,22 @@ int main(int argc, char *argv[]) {
   yylex_destroy();
   fclose(stdin);
   fprintf(fptr,"\n}\n");
-  fclose(fptr);
-  destroyPile(labelStack);
 
+
+  fprintf(fptr,"\n\n");
+  fprintf(fptr,"\n\n");
+  fprintf(fptr,"declare i32 @printf(ptr noundef, ...) #1\n");
+  fprintf(fptr,"attributes #0 = { noinline nounwind optnone sspstrong uwtable \"frame-pointer\"=\"all\" \"min-legal-vector-width\"=\"0\" \"no-trapping-math\"=\"true\" \"stack-protector-buffer-size\"=\"8\" \"target-cpu\"=\"x86-64\" \"target-features\"=\"+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87\" \"tune-cpu\"=\"generic\" }\n");
+  fprintf(fptr,"attributes #1 = { \"frame-pointer\"=\"all\" \"no-trapping-math\"=\"true\" \"stack-protector-buffer-size\"=\"8\" \"target-cpu\"=\"x86-64\" \"target-features\"=\"+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87\" \"tune-cpu\"=\"generic\" }\n");
+
+  for(int i = 0; i < stringsCount; i++) {
+    fprintf(fptr,"@.str.%d = private unnamed_addr constant [%d x i8] c\"%s\", align 1\n",
+            i, stringsEstaticas[i].size, stringsEstaticas[i].data);
+    free(stringsEstaticas[i].data);
+  }
+  fclose(fptr); 
+  destroyPile(labelStack);
+  
   printTempSymbTable(tabelaTemp, lastTemp);
   return 0;
 }

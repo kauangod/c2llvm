@@ -9,6 +9,7 @@ typedef enum {
   Char = 1,
   Int = 2,
   Bool = 3,
+  TypeError = 4,
 } Types;
 
 enum Operations {
@@ -41,6 +42,11 @@ typedef struct {
   size_t index;
 } Symbol;
 
+typedef struct {
+  char* data;
+  size_t size;
+} String;
+
 struct Event {
   short isAtrib;
   char name[256];
@@ -53,6 +59,7 @@ typedef struct {
   float arg2;
   char result[8];
   char name[64];
+  Types type;
 } TempSymb;
 
 void printTempSymbTable(TempSymb *table, int max);
