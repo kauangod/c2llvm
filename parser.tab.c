@@ -579,10 +579,10 @@ static const yytype_int16 yyrline[] =
 {
        0,    78,    78,    82,    83,    87,    94,   101,   102,   112,
      113,   117,   118,   119,   120,   121,   122,   126,   140,   126,
-     151,   160,   164,   179,   183,   214,   230,   234,   256,   266,
-     256,   274,   274,   285,   291,   295,   303,   311,   315,   323,
-     331,   335,   343,   351,   359,   371,   375,   383,   391,   399,
-     407,   415,   423,   431,   439,   447,   455
+     151,   160,   164,   181,   185,   216,   232,   236,   258,   268,
+     258,   276,   276,   287,   293,   297,   305,   313,   317,   325,
+     333,   337,   345,   353,   361,   373,   377,   385,   393,   401,
+     409,   417,   425,   433,   441,   449,   457
 };
 #endif
 
@@ -1597,22 +1597,24 @@ yyreduce:
       for (int i = 0; i < indentation; i++) { fprintf(fptr, "\t"); }
       char* aux;
       aux = strdup((yyvsp[0].name));
-      fprintf(fptr, "%%%d = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str, ptr noundef %%%d)\n", tempCounter + lastTemp, getSymbolTableValue(hashTable, aux).index);
+      fprintf(fptr, "%%%d = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str.%d, ptr noundef %%var%d)\n", tempCounter + lastTemp, stringsCount, getSymbolTableValue(hashTable, aux).index);
       tempCounter++;
       free(aux);
+      stringsEstaticas[stringsCount] = temp;
+      stringsCount++;
     }
 }
-#line 1606 "parser.tab.c"
+#line 1608 "parser.tab.c"
     break;
 
   case 23: /* write_command: writeCommand LEFT write_value RIGHT  */
-#line 179 "parser.y"
+#line 181 "parser.y"
                                         { have_printf = 1; }
-#line 1612 "parser.tab.c"
+#line 1614 "parser.tab.c"
     break;
 
   case 24: /* write_value: STRING COMMA write_formats  */
-#line 183 "parser.y"
+#line 185 "parser.y"
                                  {
       String temp;
       Types type = parseString((yyvsp[-2].name), &temp);
@@ -1644,11 +1646,11 @@ yyreduce:
       tempCounter += lastTemp;
       lastTemp = 0;
     }
-#line 1648 "parser.tab.c"
+#line 1650 "parser.tab.c"
     break;
 
   case 25: /* write_value: STRING  */
-#line 214 "parser.y"
+#line 216 "parser.y"
              {
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "%%%d = call i32 (ptr, ...) @printf(ptr noundef @.str.%d)\n", tempCounter + lastTemp, stringsCount);
@@ -1662,18 +1664,18 @@ yyreduce:
       stringsCount++;
       tempCounter++;
     }
-#line 1666 "parser.tab.c"
+#line 1668 "parser.tab.c"
     break;
 
   case 26: /* write_formats: expr  */
-#line 230 "parser.y"
+#line 232 "parser.y"
              {
         }
-#line 1673 "parser.tab.c"
+#line 1675 "parser.tab.c"
     break;
 
   case 27: /* atrib: ID EQUALS expr  */
-#line 234 "parser.y"
+#line 236 "parser.y"
                      {
       printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation, getSymbolTableValue(hashTable, (yyvsp[-2].name)).Type);
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
@@ -1693,11 +1695,11 @@ yyreduce:
       tempCounter += lastTemp;
       lastTemp = 0;
     }
-#line 1697 "parser.tab.c"
+#line 1699 "parser.tab.c"
     break;
 
   case 28: /* $@3: %empty  */
-#line 256 "parser.y"
+#line 258 "parser.y"
                                {
       printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation, Int);
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
@@ -1709,57 +1711,57 @@ yyreduce:
       fprintf(fptr, "Label%d:\n", lastLabel++);
       indentation++;
       }
-#line 1713 "parser.tab.c"
+#line 1715 "parser.tab.c"
     break;
 
   case 29: /* $@4: %empty  */
-#line 266 "parser.y"
+#line 268 "parser.y"
                         {// printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation);
       tempCounter += lastTemp;
       lastTemp = 0;
       indentation--;
       }
-#line 1723 "parser.tab.c"
+#line 1725 "parser.tab.c"
     break;
 
   case 31: /* $@5: %empty  */
-#line 274 "parser.y"
+#line 276 "parser.y"
            {
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br label %%Label%d\n\n", lastLabel);
       fprintf(fptr, "Label%d:\n", (int) popPile(labelStack));
       indentation++;
       }
-#line 1734 "parser.tab.c"
+#line 1736 "parser.tab.c"
     break;
 
   case 32: /* else_command: ELSE $@5 B_LEFT commands B_RIGHT  */
-#line 279 "parser.y"
+#line 281 "parser.y"
                                 {
       indentation--;
       fprintf(fptr, "br label %%Label%d\n\n", lastLabel);
       fprintf(fptr, "Label%d:\n", lastLabel);
       lastLabel++;
       }
-#line 1745 "parser.tab.c"
+#line 1747 "parser.tab.c"
     break;
 
   case 33: /* else_command: %empty  */
-#line 285 "parser.y"
+#line 287 "parser.y"
              {
     fprintf(fptr, "Label%d:\n", (int) popPile(labelStack));
     }
-#line 1753 "parser.tab.c"
+#line 1755 "parser.tab.c"
     break;
 
   case 34: /* logical_expr: logical_operations  */
-#line 291 "parser.y"
+#line 293 "parser.y"
                        {(yyval.intValue) = (yyvsp[0].intValue);}
-#line 1759 "parser.tab.c"
+#line 1761 "parser.tab.c"
     break;
 
   case 35: /* expr: expr PLUS term  */
-#line 295 "parser.y"
+#line 297 "parser.y"
                      {(yyval.doubleValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_PLUS;
       tabelaTemp[lastTemp].arg1 = (yyvsp[-2].doubleValue);
@@ -1768,11 +1770,11 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
       }
-#line 1772 "parser.tab.c"
+#line 1774 "parser.tab.c"
     break;
 
   case 36: /* expr: expr MINUS term  */
-#line 303 "parser.y"
+#line 305 "parser.y"
                       {(yyval.doubleValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_DIV;
       tabelaTemp[lastTemp].arg1 = (yyvsp[-2].doubleValue);
@@ -1781,17 +1783,17 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
       }
-#line 1785 "parser.tab.c"
+#line 1787 "parser.tab.c"
     break;
 
   case 37: /* expr: term  */
-#line 311 "parser.y"
+#line 313 "parser.y"
            {(yyval.doubleValue) = (yyvsp[0].doubleValue);}
-#line 1791 "parser.tab.c"
+#line 1793 "parser.tab.c"
     break;
 
   case 38: /* term: term TIMES factor  */
-#line 315 "parser.y"
+#line 317 "parser.y"
                         {(yyval.doubleValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_MULT;
       tabelaTemp[lastTemp].arg1 = (yyvsp[-2].doubleValue);
@@ -1800,11 +1802,11 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
       }
-#line 1804 "parser.tab.c"
+#line 1806 "parser.tab.c"
     break;
 
   case 39: /* term: term DIVIDE factor  */
-#line 323 "parser.y"
+#line 325 "parser.y"
                          {(yyval.doubleValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_DIV;
       tabelaTemp[lastTemp].arg1 = (yyvsp[-2].doubleValue);
@@ -1813,17 +1815,17 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
       }
-#line 1817 "parser.tab.c"
+#line 1819 "parser.tab.c"
     break;
 
   case 40: /* term: factor  */
-#line 331 "parser.y"
+#line 333 "parser.y"
              {(yyval.doubleValue) = (yyvsp[0].doubleValue);}
-#line 1823 "parser.tab.c"
+#line 1825 "parser.tab.c"
     break;
 
   case 41: /* factor: DOUBLE  */
-#line 335 "parser.y"
+#line 337 "parser.y"
              {(yyval.doubleValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_EQUAL;
       tabelaTemp[lastTemp].arg1 = (yyvsp[0].doubleValue);
@@ -1832,11 +1834,11 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
     }
-#line 1836 "parser.tab.c"
+#line 1838 "parser.tab.c"
     break;
 
   case 42: /* factor: INT  */
-#line 343 "parser.y"
+#line 345 "parser.y"
           {(yyval.doubleValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_EQUAL;
       tabelaTemp[lastTemp].arg1 = (yyvsp[0].intValue);
@@ -1845,11 +1847,11 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
     }
-#line 1849 "parser.tab.c"
+#line 1851 "parser.tab.c"
     break;
 
   case 43: /* factor: CHARACTER  */
-#line 351 "parser.y"
+#line 353 "parser.y"
                 {(yyval.doubleValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_EQUAL;
       tabelaTemp[lastTemp].arg1 = (yyvsp[0].character);
@@ -1858,11 +1860,11 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
     }
-#line 1862 "parser.tab.c"
+#line 1864 "parser.tab.c"
     break;
 
   case 44: /* factor: ID  */
-#line 359 "parser.y"
+#line 361 "parser.y"
          {
       (yyval.doubleValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_VAR;
@@ -1875,17 +1877,17 @@ yyreduce:
       lastTemp++;
       free((yyvsp[0].name));
       }
-#line 1879 "parser.tab.c"
+#line 1881 "parser.tab.c"
     break;
 
   case 45: /* factor: LEFT expr RIGHT  */
-#line 371 "parser.y"
+#line 373 "parser.y"
                       {(yyval.doubleValue) = (yyvsp[-1].doubleValue);}
-#line 1885 "parser.tab.c"
+#line 1887 "parser.tab.c"
     break;
 
   case 46: /* logical_operations: logical_operations AND logical_operations  */
-#line 375 "parser.y"
+#line 377 "parser.y"
                                                 {(yyval.intValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_AND;
       tabelaTemp[lastTemp].arg1 = (yyvsp[-2].intValue);
@@ -1894,11 +1896,11 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
       }
-#line 1898 "parser.tab.c"
+#line 1900 "parser.tab.c"
     break;
 
   case 47: /* logical_operations: logical_operations OR logical_operations  */
-#line 383 "parser.y"
+#line 385 "parser.y"
                                                {(yyval.intValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_OR;
       tabelaTemp[lastTemp].arg1 = (yyvsp[-2].intValue);
@@ -1907,11 +1909,11 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
       }
-#line 1911 "parser.tab.c"
+#line 1913 "parser.tab.c"
     break;
 
   case 48: /* logical_operations: logical_operations GT expr  */
-#line 391 "parser.y"
+#line 393 "parser.y"
                                  {(yyval.intValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_GT;
       tabelaTemp[lastTemp].arg1 = (yyvsp[-2].intValue);
@@ -1920,11 +1922,11 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
       }
-#line 1924 "parser.tab.c"
+#line 1926 "parser.tab.c"
     break;
 
   case 49: /* logical_operations: logical_operations GE expr  */
-#line 399 "parser.y"
+#line 401 "parser.y"
                                   {(yyval.intValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_GE;
       tabelaTemp[lastTemp].arg1 = (yyvsp[-2].intValue);
@@ -1933,11 +1935,11 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
       }
-#line 1937 "parser.tab.c"
+#line 1939 "parser.tab.c"
     break;
 
   case 50: /* logical_operations: logical_operations LT expr  */
-#line 407 "parser.y"
+#line 409 "parser.y"
                                  {(yyval.intValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_LT;
       tabelaTemp[lastTemp].arg1 = (yyvsp[-2].intValue);
@@ -1946,11 +1948,11 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
       }
-#line 1950 "parser.tab.c"
+#line 1952 "parser.tab.c"
     break;
 
   case 51: /* logical_operations: logical_operations LE expr  */
-#line 415 "parser.y"
+#line 417 "parser.y"
                                   {(yyval.intValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_LE;
       tabelaTemp[lastTemp].arg1 = (yyvsp[-2].intValue);
@@ -1959,11 +1961,11 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
       }
-#line 1963 "parser.tab.c"
+#line 1965 "parser.tab.c"
     break;
 
   case 52: /* logical_operations: logical_operations DIF expr  */
-#line 423 "parser.y"
+#line 425 "parser.y"
                                   {(yyval.intValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_DIF;
       tabelaTemp[lastTemp].arg1 = (yyvsp[-2].intValue);
@@ -1972,11 +1974,11 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
       }
-#line 1976 "parser.tab.c"
+#line 1978 "parser.tab.c"
     break;
 
   case 53: /* logical_operations: logical_operations l_EQUALS expr  */
-#line 431 "parser.y"
+#line 433 "parser.y"
                                        {(yyval.intValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_L_EQUAL;
       tabelaTemp[lastTemp].arg1 = (yyvsp[-2].intValue);
@@ -1985,11 +1987,11 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
       }
-#line 1989 "parser.tab.c"
+#line 1991 "parser.tab.c"
     break;
 
   case 54: /* logical_operations: NOT logical_operations  */
-#line 439 "parser.y"
+#line 441 "parser.y"
                              {(yyval.intValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_NOT;
       tabelaTemp[lastTemp].arg1 = (yyvsp[0].intValue);
@@ -1998,11 +2000,11 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
     }
-#line 2002 "parser.tab.c"
+#line 2004 "parser.tab.c"
     break;
 
   case 55: /* logical_operations: NOT LEFT logical_operations RIGHT  */
-#line 447 "parser.y"
+#line 449 "parser.y"
                                         {(yyval.intValue) = lastTemp;
       tabelaTemp[lastTemp].op = OP_NOT;
       tabelaTemp[lastTemp].arg1 = (yyvsp[-1].intValue);
@@ -2011,17 +2013,17 @@ yyreduce:
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
     }
-#line 2015 "parser.tab.c"
+#line 2017 "parser.tab.c"
     break;
 
   case 56: /* logical_operations: expr  */
-#line 455 "parser.y"
+#line 457 "parser.y"
            {(yyval.intValue) = (yyvsp[0].doubleValue);}
-#line 2021 "parser.tab.c"
+#line 2023 "parser.tab.c"
     break;
 
 
-#line 2025 "parser.tab.c"
+#line 2027 "parser.tab.c"
 
       default: break;
     }
@@ -2245,7 +2247,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 457 "parser.y"
+#line 459 "parser.y"
 
 
 int yywrap( ) {

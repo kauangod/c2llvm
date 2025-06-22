@@ -84,11 +84,19 @@ Label4:
 	%47 = call i32 (ptr, ...) @printf(ptr noundef @.str.8, i32 noundef %46)
 	%48 = load i32, i32* %var2, align 4
 	%49 = call i32 (ptr, ...) @printf(ptr noundef @.str.9, i32 noundef %48)
-	%50 = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str, ptr noundef %6)
-	%51 = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str, ptr noundef %7)
-	%52 = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str, ptr noundef %8)
-	%53 = load i32, i32* %var5, align 4
-	ret i32 %53
+	%50 = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str.10, ptr noundef %var6)
+	%51 = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str.11, ptr noundef %var7)
+	%52 = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str.12, ptr noundef %var8)
+	%53 = load i32, i32* %var6, align 4
+	%54 = call i32 (ptr, ...) @printf(ptr noundef @.str.13, i32 noundef %53)
+	%55 = load float, float* %var7, align 4
+	%56 = fpext float %55 to double
+%57 = call i32 (ptr, ...) @printf(ptr noundef @.str.14, double noundef %56)
+	%58 = load i8, i8* %var8, align 1
+	%59 = sext i8 %58 to i32
+%60 = call i32 (ptr, ...) @printf(ptr noundef @.str.15, i32 noundef %59)
+	%61 = load i32, i32* %var5, align 4
+	ret i32 %61
 
 }
 
@@ -111,3 +119,9 @@ attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protect
 @.str.7 = private unnamed_addr constant [12 x i8] c"testeF: %f\0A\00", align 1
 @.str.8 = private unnamed_addr constant [12 x i8] c"result: %d\0A\00", align 1
 @.str.9 = private unnamed_addr constant [7 x i8] c"i: %d\0A\00", align 1
+@.str.10 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
+@.str.11 = private unnamed_addr constant [3 x i8] c"%f\00", align 1
+@.str.12 = private unnamed_addr constant [4 x i8] c"\0A%c\00", align 1
+@.str.13 = private unnamed_addr constant [15 x i8] c"testeScan: %d\0A\00", align 1
+@.str.14 = private unnamed_addr constant [16 x i8] c"testeScan1: %f\0A\00", align 1
+@.str.15 = private unnamed_addr constant [16 x i8] c"testeScan2: %c\0A\00", align 1

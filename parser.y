@@ -168,9 +168,11 @@ read_value: STRING COMMA '&'ID {
       for (int i = 0; i < indentation; i++) { fprintf(fptr, "\t"); }
       char* aux;
       aux = strdup($4);
-      fprintf(fptr, "%%%d = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str, ptr noundef %%var%d)\n", tempCounter + lastTemp, getSymbolTableValue(hashTable, aux).index);
+      fprintf(fptr, "%%%d = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str.%d, ptr noundef %%var%d)\n", tempCounter + lastTemp, stringsCount, getSymbolTableValue(hashTable, aux).index);
       tempCounter++;
       free(aux);
+      stringsEstaticas[stringsCount] = temp;
+      stringsCount++;
     }
 }
 ;

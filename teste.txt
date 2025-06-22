@@ -42,6 +42,9 @@ printf("result: %d\n", result);
 printf("i: %d\n", i);
 scanf("%d", &testeScan);
 scanf("%f", &testeScan1);
-scanf("%c", &testeScan2);
+scanf("\n%c", &testeScan2);
+printf("testeScan: %d\n", testeScan);
+printf("testeScan1: %f\n", testeScan1);
+printf("testeScan2: %c\n", testeScan2);
 
 return result;
