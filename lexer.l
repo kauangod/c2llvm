@@ -37,6 +37,7 @@
 "while"          {return WHILE;}
 "{"              {return B_LEFT;}
 "}"              {return B_RIGHT;}
+","              {return COMMA;}
 "'\\n'"          {yylval.character = '\n'; return CHARACTER;}
 (['"])[\x00-\x7F]\1   {yylval.character = yytext[1]; return CHARACTER;}
 \"[^"]*\"        {yylval.name = process_string(yytext); return STRING; }

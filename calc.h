@@ -19,5 +19,6 @@ void assignBooleanValue(ht *hash, char *name, int value);
 char* process_string(const char* text); // made by chatgpt
 void printTempSymbTableToFile(FILE *file, TempSymb *table, int max, int identation, Types type);
 char* tempSymbTableToString(TempSymb *table, int max);
+Types parseString(const char *string, String *result);
 
 #endif // !CALC
