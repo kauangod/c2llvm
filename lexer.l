@@ -3,7 +3,6 @@
 #include <string.h>
 #include "parser.tab.h"
 #include "calc.h"
-
 %}
 
 %option noyywrap
@@ -14,9 +13,10 @@
 "float"          {return FLOATtype;}
 "boolean"        {return BOOLEANtype;}
 "char"           {return CHARtype;}
-"write"          {return writeCommand;}
-"read"           {return readCommand;}
+"printf"          {return writeCommand;}
+"scanf"           {return readCommand;}
 "return"         {return returnCommand;}
+";"              {return ';';}
 "+"              {return PLUS;}
 "-"              {return MINUS;}
 "/"              {return DIVIDE;}
@@ -38,10 +38,10 @@
 "{"              {return B_LEFT;}
 "}"              {return B_RIGHT;}
 "'\\n'"          {yylval.character = '\n'; return CHARACTER;}
-"'"[\x0-\x7f]"'" {yylval.character = yytext[1]; return CHARACTER;}
+(['"])[\x00-\x7F]\1   {yylval.character = yytext[1]; return CHARACTER;}
 \"[^"]*\"        {yylval.name = process_string(yytext); return STRING; }
 
-[a-zA-Z_][a-zA-Z_0-9]{0,9} {yylval.name = strdup(yytext); return ID; }
+[a-zA-Z_][a-zA-Z_0-9]{0,9} {yylval.name = strdup(yytext); return ID; } /* Máximo de 10 caracteres para o identificador, o dup retorna o ponteiro para a string. */
 "="		                     {return EQUALS;}
 [-+]?[0-9]+                {yylval.intValue = atoi(yytext); return INT;}
 [-+]?[0-9]+"."[0-9]+       {yylval.doubleValue = atof(yytext); return DOUBLE;}

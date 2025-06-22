@@ -63,31 +63,30 @@ extern int yydebug;
     TIMES = 264,                   /* TIMES  */
     LEFT = 265,                    /* LEFT  */
     RIGHT = 266,                   /* RIGHT  */
-    DONE = 267,                    /* DONE  */
-    ID = 268,                      /* ID  */
-    STRING = 269,                  /* STRING  */
-    EQUALS = 270,                  /* EQUALS  */
-    AND = 271,                     /* AND  */
-    OR = 272,                      /* OR  */
-    GT = 273,                      /* GT  */
-    GE = 274,                      /* GE  */
-    LT = 275,                      /* LT  */
-    LE = 276,                      /* LE  */
-    l_EQUALS = 277,                /* l_EQUALS  */
-    DIF = 278,                     /* DIF  */
-    NOT = 279,                     /* NOT  */
-    B_LEFT = 280,                  /* B_LEFT  */
-    B_RIGHT = 281,                 /* B_RIGHT  */
-    IF = 282,                      /* IF  */
-    ELSE = 283,                    /* ELSE  */
-    WHILE = 284,                   /* WHILE  */
-    INTtype = 285,                 /* INTtype  */
-    FLOATtype = 286,               /* FLOATtype  */
-    BOOLEANtype = 287,             /* BOOLEANtype  */
-    CHARtype = 288,                /* CHARtype  */
-    writeCommand = 289,            /* writeCommand  */
-    readCommand = 290,             /* readCommand  */
-    returnCommand = 291            /* returnCommand  */
+    ID = 267,                      /* ID  */
+    STRING = 268,                  /* STRING  */
+    EQUALS = 269,                  /* EQUALS  */
+    AND = 270,                     /* AND  */
+    OR = 271,                      /* OR  */
+    GT = 272,                      /* GT  */
+    GE = 273,                      /* GE  */
+    LT = 274,                      /* LT  */
+    LE = 275,                      /* LE  */
+    l_EQUALS = 276,                /* l_EQUALS  */
+    DIF = 277,                     /* DIF  */
+    NOT = 278,                     /* NOT  */
+    B_LEFT = 279,                  /* B_LEFT  */
+    B_RIGHT = 280,                 /* B_RIGHT  */
+    IF = 281,                      /* IF  */
+    ELSE = 282,                    /* ELSE  */
+    WHILE = 283,                   /* WHILE  */
+    INTtype = 284,                 /* INTtype  */
+    FLOATtype = 285,               /* FLOATtype  */
+    BOOLEANtype = 286,             /* BOOLEANtype  */
+    CHARtype = 287,                /* CHARtype  */
+    writeCommand = 288,            /* writeCommand  */
+    readCommand = 289,             /* readCommand  */
+    returnCommand = 290            /* returnCommand  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -103,7 +102,7 @@ union YYSTYPE
   double doubleValue;
   int intValue;
 
-#line 107 "parser.tab.h"
+#line 106 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

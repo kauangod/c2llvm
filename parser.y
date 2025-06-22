@@ -62,6 +62,8 @@ int indentation = 1;
 %token readCommand
 %token returnCommand
 
+%define parse.error verbose
+
 %type <doubleValue> expr term factor
 
 %type <intValue> logical_operations logical_expr else_command
@@ -73,7 +75,7 @@ program:
 
 declarations:
       %empty
-    | declarations declaration
+    | declarations declaration ';'
 ;
 
 declaration:
@@ -81,14 +83,14 @@ declaration:
       fprintf(fptr, "\t");
       char* temp = strdup($2);
       declareVariableAtTable(hashTable, $2, Int);
-      fprintf(fptr, "%%var%d = alloca i32, align 4\n", getSymbolTableValue(hashTable, temp).index, temp);
+      fprintf(fptr, "%%var%d = alloca i32, align 4\n", getSymbolTableValue(hashTable, temp).index);
       free(temp);
       }
     | FLOATtype ID {
       fprintf(fptr, "\t");
       char* temp = strdup($2);
       declareVariableAtTable(hashTable, $2, Float);
-      fprintf(fptr, "%%var%d = alloca float, align 4\n", getSymbolTableValue(hashTable, temp).index, temp);
+      fprintf(fptr, "%%var%d = alloca float, align 4\n", getSymbolTableValue(hashTable, temp).index);
       free(temp);
       }
     | BOOLEANtype ID {fprintf(fptr, "bool %s;\n", strdup($2)); declareVariableAtTable(hashTable, $2, Bool);}
@@ -108,10 +110,10 @@ commands:
 
 command:
       if_command
-    | atrib
-    | read_command
-    | write_command
-    | return_command
+    | atrib ';'
+    | read_command ';'
+    | write_command ';'
+    | return_command ';'
     | while_command
 ;
 
@@ -445,7 +447,7 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "Usage: %s <input-file>\n", argv[0]);
       return 1;
   }
-  yyin = fopen(argv[1], "r");
+  yyin = fopen(argv[1], "r"); /* Abre o arquivo de entrada, posição zero é equivalente ao nome do programa executável. */
   if (yyin == NULL) {
       fprintf(stderr, "Error opening file `%s`\n", argv[1]);
       return 1;
