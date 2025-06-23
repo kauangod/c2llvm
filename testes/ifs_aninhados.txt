@@ -1,0 +1,30 @@
+
+int num;
+int temp;
+printf("Digite um número inteiro: ");
+scanf("%d", &num);
+
+if (num >= 0) {
+    if (num == 0) {
+        printf("O número é zero.\n");
+    } else {
+        temp = num / 2;
+        if (temp * 2 == num) {
+            if (num > 100) {
+                printf("Número positivo, par e maior que 100.\n");
+            } else {
+                printf("Número positivo, par e até 100.\n");
+            }
+        } else {
+            printf("Número positivo e ímpar.\n");
+        }
+    }
+} else {
+    if (num < -100) {
+        printf("Número negativo e menor que -100.\n");
+    } else {
+        printf("Número negativo entre -100 e -1.\n");
+    }
+}
+
+return 0;

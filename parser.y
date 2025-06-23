@@ -81,12 +81,6 @@ statement_list : statement | statement statement_list
 
 statement : declaration';' | command
 
-//program:
-//      %empty
-//    | declarations program
-//    | commands program
-//;
-
 declarations:
       %empty
     | declarations declaration
@@ -281,10 +275,12 @@ else_command:
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br label %%Label%d\n\n", lastLabel);
       fprintf(fptr, "Label%d:\n", (int) popPile(labelStack));
-      } B_LEFT commands B_RIGHT {
-      fprintf(fptr, "br label %%Label%d\n\n", lastLabel);
-      fprintf(fptr, "Label%d:\n", lastLabel);
+      pilePush(labelStack, lastLabel);
       lastLabel++;
+      } B_LEFT commands B_RIGHT {
+      int temp = (int) popPile(labelStack);
+      fprintf(fptr, "br label %%Label%d\n\n", temp);
+      fprintf(fptr, "Label%d:\n", temp);
       }
     | %empty {
       int temp = (int) popPile(labelStack);
@@ -308,7 +304,7 @@ expr:
       lastTemp++;
       }
     | expr MINUS term {$$ = lastTemp;
-      tabelaTemp[lastTemp].op = OP_DIV;
+      tabelaTemp[lastTemp].op = OP_MINUS;
       tabelaTemp[lastTemp].arg1 = $1;
       tabelaTemp[lastTemp].arg2 = $3;
       sprintf(str_num, "%%%d", lastTemp + tempCounter);
@@ -475,7 +471,7 @@ extern int yylex_destroy(void);
 extern FILE *yyin;
 
 int main(int argc, char *argv[]) {
-  if (argc != 2) {
+  if (argc < 2) {
       fprintf(stderr, "Usage: %s <input-file>\n", argv[0]);
       return 1;
   }
@@ -486,8 +482,11 @@ int main(int argc, char *argv[]) {
   }
 
 
+  if (argc > 2)
+    fptr = fopen(argv[2], "w");
+  else
+    fptr = fopen("saida.ll", "w");
   // Open a file in writing mode
-  fptr = fopen("saida.ll", "w");
 
   // int c; copiar conteudo do codigo fonte para a saida.
   // while ((c = fgetc(yyin)) != EOF)
@@ -532,8 +531,8 @@ int main(int argc, char *argv[]) {
   if (have_scanf) {
     fprintf(fptr,"declare i32 @__isoc99_scanf(ptr noundef, ...) #1\n\n");
   }
-  fprintf(fptr,"attributes #0 = { noinline nounwind optnone sspstrong uwtable \"frame-pointer\"=\"all\" \"min-legal-vector-width\"=\"0\" \"no-trapping-math\"=\"true\" \"stack-protector-buffer-size\"=\"8\" \"target-cpu\"=\"x86-64\" \"target-features\"=\"+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87\" \"tune-cpu\"=\"generic\" }\n");
-  fprintf(fptr,"attributes #1 = { \"frame-pointer\"=\"all\" \"no-trapping-math\"=\"true\" \"stack-protector-buffer-size\"=\"8\" \"target-cpu\"=\"x86-64\" \"target-features\"=\"+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87\" \"tune-cpu\"=\"generic\" }\n");
+  // fprintf(fptr,"attributes #0 = { noinline nounwind optnone sspstrong uwtable \"frame-pointer\"=\"all\" \"min-legal-vector-width\"=\"0\" \"no-trapping-math\"=\"true\" \"stack-protector-buffer-size\"=\"8\" \"target-cpu\"=\"x86-64\" \"target-features\"=\"+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87\" \"tune-cpu\"=\"generic\" }\n");
+  // fprintf(fptr,"attributes #1 = { \"frame-pointer\"=\"all\" \"no-trapping-math\"=\"true\" \"stack-protector-buffer-size\"=\"8\" \"target-cpu\"=\"x86-64\" \"target-features\"=\"+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87\" \"tune-cpu\"=\"generic\" }\n");
 
   for(int i = 0; i < stringsCount; i++) {
     fprintf(fptr,"@.str.%d = private unnamed_addr constant [%d x i8] c\"%s\", align 1\n",

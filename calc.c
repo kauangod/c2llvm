@@ -577,15 +577,13 @@ Types parseString(const char *string, String *result) {
   size_t old_len = strlen(string);
   size_t count = 0;
 
-  // First, count how many times "old" appears in "source"
   const char *pos = string;
   while ((pos = strstr(pos, "\n")) != NULL) {
     count++;
     pos += old_len;
   }
 
-  // Allocate enough space for new string
-  size_t new_size = strlen(string) + (count+1) * 3;
+  size_t new_size = strlen(string) + count * 2 + 4;
   result->data = malloc(new_size);
   result->size = strlen(string)  + 1;
   if (!result->data)
@@ -597,18 +595,15 @@ Types parseString(const char *string, String *result) {
   while (*pos) {
     const char *match = strstr(pos, "\n");
     if (match) {
-      // Copy up to match
       size_t len = match - pos;
       memcpy(dst, pos, len);
       dst += len;
 
-      // Copy replacement string
       memcpy(dst, "\\0A", 3);
       dst += 3;
 
       pos = match + 1;
     } else {
-      // No more matches, copy the rest
       strcpy(dst, pos);
       break;
     }

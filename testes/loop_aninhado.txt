@@ -1,0 +1,29 @@
+
+int i;
+int A;
+int j;
+int B;
+int resultado;
+
+i = 0;
+j = 0;
+
+printf("Insira o valor de A: ");
+scanf("%d", &A);
+printf("Insira o valor de B: ");
+scanf("%d", &B);
+
+resultado = 0;
+
+while (i < A) {
+  while (j < B) { 
+    resultado = resultado + 1;
+    j = j + 1;
+  }
+  j = 0;
+  i = i + 1;
+}
+
+printf("A * B = %d\n", resultado);
+
+return 0;

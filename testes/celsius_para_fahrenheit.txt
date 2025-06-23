@@ -1,0 +1,7 @@
+float c;
+scanf("%f", &c);
+float f;
+f= (c * 9/5) + 32;
+printf("%f °C = ", c);
+printf("%f °F\n", f);
+return 0;

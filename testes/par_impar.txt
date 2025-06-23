@@ -1,0 +1,16 @@
+
+int entrada;
+
+printf("Insira um número inteiro: ");
+scanf("%d", &entrada);
+
+int temp;
+temp = entrada / 2; 
+
+if (temp * 2 == entrada) {
+  printf("O numero %d, é par\n", entrada);
+} else {
+  printf("O numero %d, é ímpar\n", entrada);
+}
+
+return 0;
