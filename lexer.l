@@ -15,7 +15,7 @@
 "boolean"        {return BOOLEANtype;}
 "char"           {return CHARtype;}
 "printf"          {return writeCommand;}
-"read"           {return readCommand;}
+"scanf"           {return readCommand;}
 "return"         {return returnCommand;}
 "+"              {return PLUS;}
 "-"              {return MINUS;}
@@ -38,6 +38,7 @@
 "{"              {return B_LEFT;}
 "}"              {return B_RIGHT;}
 ","              {return COMMA;}
+"&"              {return '&';}
 "'\\n'"          {yylval.character = '\n'; return CHARACTER;}
 "'"[\x0-\x7f]"'" {yylval.character = yytext[1]; return CHARACTER;}
 \"[^"]*\"        {yylval.name = process_string(yytext); return STRING; }
