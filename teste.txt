@@ -1,5 +1,3 @@
-char testeChar;
-int i;
 int testeVar;
 float testeF;
 int result;
@@ -8,41 +6,43 @@ float testeScan1;
 char testeScan2;
 int teste;
 testeF = 2 * 2.5;
-testeChar = 'a';
 
-if (testeF > 3) {
+if (testeF > 1) {
   testeVar = 10;
 }
 else {
   testeVar = 3;
 }
 
+int i ;
 i = 0;
 result = 1;
+int temp;
 
 while ( i < testeVar ) {
-  result = result * 2;
+  result = result + 3;
   i = i + 1;
+
+  temp = result / 2;
+  if (temp * 2 == result) {
+    printf("result é par: %d\n", result);
+    temp = result / 3;
+    if (temp * 3 == result) {
+      printf("result é par e multiplo de 3: %d\n", result);
+    }
+    result = result + 1;
+  } else {
+    printf("result é impar: %d\n", result);
+  }
 }
 
+char testeChar;
 testeChar = 'a' + 1;
 
 printf("testeChar: %c\n", testeChar);
-printf("testeVar: %d\n", testeVar);
-printf("testeF: %f\n", testeF);
-printf("result: %d\n", result);
-printf("i: %d\n", i);
+printf("testeVar: %d\n", testeVar + 25);
 
 
-testeChar = 'a' + 1;
 
-printf("testeChar: %c\n", testeChar);
-printf("testeVar: %d\n", testeVar);
-printf("testeF: %f\n", testeF);
-printf("result: %d\n", result);
-printf("i: %d\n", i);
-scanf("%d", &testeScan);
-scanf("%f", &testeScan1);
-scanf("%c", &testeScan2);
 
 return result;
