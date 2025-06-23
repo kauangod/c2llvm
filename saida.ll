@@ -1,102 +1,107 @@
 define i32 @main() {
 entry:
-	%var1 = alloca i8, align 1
-	%var2 = alloca i32, align 4
+	%var1 = alloca i32, align 4
+	%var2 = alloca float, align 4
 	%var3 = alloca i32, align 4
-	%var4 = alloca float, align 4
-	%var5 = alloca i32, align 4
-	%var6 = alloca i32, align 4
-	%var7 = alloca float, align 4
-	%var8 = alloca i8, align 1
 	%0 = fadd float 0.0, 2.000000
 	%1 = fadd float 0.0, 2.500000
 	%2 = fmul float %0, %1
-	store float %2, ptr %var4, align 4;
-	%3 = add i8 0, 97
-	store i8 %3, ptr %var1, align 1;
-	%4 = load i32, i32* %var4, align 4
-	%5 = add i32 0, 3
-	%6 = icmp sgt i32 %4, %5
-	br i1 %6, label %Label1, label %Label0
+	store float %2, ptr %var2, align 4;
+	%3 = load i32, i32* %var2, align 4
+	%4 = add i32 0, 1
+	%5 = icmp sgt i32 %3, %4
+	br i1 %5, label %Label1, label %Label0
 Label1:
-		%7 = add i32 0, 10
-		store i32 %7, ptr %var3, align 4;
+		%6 = add i32 0, 10
+		store i32 %6, ptr %var1, align 4;
 	br label %Label2
 
 Label0:
-		%8 = add i32 0, 3
-		store i32 %8, ptr %var3, align 4;
+		%7 = add i32 0, 3
+		store i32 %7, ptr %var1, align 4;
 br label %Label2
 
 Label2:
-	%9 = add i32 0, 0
-	store i32 %9, ptr %var2, align 4;
-	%10 = add i32 0, 1
-	store i32 %10, ptr %var5, align 4;
+	%var4 = alloca i32, align 4
+	%8 = add i32 0, 0
+	store i32 %8, ptr %var4, align 4;
+	%9 = add i32 0, 1
+	store i32 %9, ptr %var3, align 4;
+	%var5 = alloca i32, align 4
 	br label %Label3
 
 Label3:
-	%11 = load i32, i32* %var2, align 4
-	%12 = load i32, i32* %var3, align 4
-	%13 = icmp slt i32 %11, %12
-	br i1 %13, label %Label5, label %Label4
+	%10 = load i32, i32* %var4, align 4
+	%11 = load i32, i32* %var1, align 4
+	%12 = icmp slt i32 %10, %11
+	br i1 %12, label %Label5, label %Label4
 Label5:
-		%14 = load i32, i32* %var5, align 4
-		%15 = add i32 0, 2
-		%16 = mul i32 %14, %15
-		store i32 %16, ptr %var5, align 4;
-		%17 = load i32, i32* %var2, align 4
-		%18 = add i32 0, 1
-		%19 = add i32 %17, %18
-		store i32 %19, ptr %var2, align 4;
+		%13 = load i32, i32* %var3, align 4
+		%14 = add i32 0, 3
+		%15 = add i32 %13, %14
+		store i32 %15, ptr %var3, align 4;
+		%16 = load i32, i32* %var4, align 4
+		%17 = add i32 0, 1
+		%18 = add i32 %16, %17
+		store i32 %18, ptr %var4, align 4;
+		%19 = load i32, i32* %var3, align 4
+		%20 = add i32 0, 2
+		%21 = udiv i32 %19, %20
+		store i32 %21, ptr %var5, align 4;
+		%22 = load i32, i32* %var5, align 4
+		%23 = add i32 0, 2
+		%24 = mul i32 %22, %23
+		%25 = load i32, i32* %var3, align 4
+		%26 = icmp eq i32 %24, %25
+		br i1 %26, label %Label7, label %Label6
+Label7:
+			%27 = load i32, i32* %var3, align 4
+			%28 = call i32 (ptr, ...) @printf(ptr noundef @.str.0, i32 noundef %27)
+			%29 = load i32, i32* %var3, align 4
+			%30 = add i32 0, 3
+			%31 = udiv i32 %29, %30
+			store i32 %31, ptr %var5, align 4;
+			%32 = load i32, i32* %var5, align 4
+			%33 = add i32 0, 3
+			%34 = mul i32 %32, %33
+			%35 = load i32, i32* %var3, align 4
+			%36 = icmp eq i32 %34, %35
+			br i1 %36, label %Label9, label %Label8
+Label9:
+				%37 = load i32, i32* %var3, align 4
+				%38 = call i32 (ptr, ...) @printf(ptr noundef @.str.1, i32 noundef %37)
+			br label %Label8
+
+Label8:
+			%39 = load i32, i32* %var3, align 4
+			%40 = add i32 0, 1
+			%41 = add i32 %39, %40
+			store i32 %41, ptr %var3, align 4;
+		br label %Label10
+
+Label6:
+			%42 = load i32, i32* %var3, align 4
+			%43 = call i32 (ptr, ...) @printf(ptr noundef @.str.2, i32 noundef %42)
+br label %Label10
+
+Label10:
 br label %Label3
 
 Label4:
-	%20 = add i8 0, 97
-	%21 = add i8 0, 1
-	%22 = add i8 %20, %21
-	store i8 %22, ptr %var1, align 1;
-	%23 = load i8, i8* %var1, align 1
-	%24 = sext i8 %23 to i32
-%25 = call i32 (ptr, ...) @printf(ptr noundef @.str.0, i32 noundef %24)
-	%26 = load i32, i32* %var3, align 4
-	%27 = call i32 (ptr, ...) @printf(ptr noundef @.str.1, i32 noundef %26)
-	%28 = load float, float* %var4, align 4
-	%29 = fpext float %28 to double
-%30 = call i32 (ptr, ...) @printf(ptr noundef @.str.2, double noundef %29)
-	%31 = load i32, i32* %var5, align 4
-	%32 = call i32 (ptr, ...) @printf(ptr noundef @.str.3, i32 noundef %31)
-	%33 = load i32, i32* %var2, align 4
-	%34 = call i32 (ptr, ...) @printf(ptr noundef @.str.4, i32 noundef %33)
-	%35 = add i8 0, 97
-	%36 = add i8 0, 1
-	%37 = add i8 %35, %36
-	store i8 %37, ptr %var1, align 1;
-	%38 = load i8, i8* %var1, align 1
-	%39 = sext i8 %38 to i32
-%40 = call i32 (ptr, ...) @printf(ptr noundef @.str.5, i32 noundef %39)
-	%41 = load i32, i32* %var3, align 4
-	%42 = call i32 (ptr, ...) @printf(ptr noundef @.str.6, i32 noundef %41)
-	%43 = load float, float* %var4, align 4
-	%44 = fpext float %43 to double
-%45 = call i32 (ptr, ...) @printf(ptr noundef @.str.7, double noundef %44)
-	%46 = load i32, i32* %var5, align 4
-	%47 = call i32 (ptr, ...) @printf(ptr noundef @.str.8, i32 noundef %46)
-	%48 = load i32, i32* %var2, align 4
-	%49 = call i32 (ptr, ...) @printf(ptr noundef @.str.9, i32 noundef %48)
-	%50 = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str.10, ptr noundef %var6)
-	%51 = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str.11, ptr noundef %var7)
-	%52 = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str.12, ptr noundef %var8)
-	%53 = load i32, i32* %var6, align 4
-	%54 = call i32 (ptr, ...) @printf(ptr noundef @.str.13, i32 noundef %53)
-	%55 = load float, float* %var7, align 4
-	%56 = fpext float %55 to double
-%57 = call i32 (ptr, ...) @printf(ptr noundef @.str.14, double noundef %56)
-	%58 = load i8, i8* %var8, align 1
-	%59 = sext i8 %58 to i32
-%60 = call i32 (ptr, ...) @printf(ptr noundef @.str.15, i32 noundef %59)
-	%61 = load i32, i32* %var5, align 4
-	ret i32 %61
+	%var6 = alloca i8, align 1
+	%44 = add i8 0, 97
+	%45 = add i8 0, 1
+	%46 = add i8 %44, %45
+	store i8 %46, ptr %var6, align 1;
+	%47 = load i8, i8* %var6, align 1
+	%48 = sext i8 %47 to i32
+%49 = call i32 (ptr, ...) @printf(ptr noundef @.str.3, i32 noundef %48)
+	%50 = load i32, i32* %var1, align 4
+	%51 = add i32 0, 25
+	%52 = add i32 %50, %51
+	%53 = call i32 (ptr, ...) @printf(ptr noundef @.str.4, i32 noundef %52)
+	%54 = load i32, i32* %var3, align 4
+	ret i32 %54
 
 }
 
@@ -104,24 +109,10 @@ Label4:
 
 
 declare i32 @printf(ptr noundef, ...) #1
-
-
-declare i32 @__isoc99_scanf(ptr noundef, ...) #1
 attributes #0 = { noinline nounwind optnone sspstrong uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-@.str.0 = private unnamed_addr constant [15 x i8] c"testeChar: %c\0A\00", align 1
-@.str.1 = private unnamed_addr constant [14 x i8] c"testeVar: %d\0A\00", align 1
-@.str.2 = private unnamed_addr constant [12 x i8] c"testeF: %f\0A\00", align 1
-@.str.3 = private unnamed_addr constant [12 x i8] c"result: %d\0A\00", align 1
-@.str.4 = private unnamed_addr constant [7 x i8] c"i: %d\0A\00", align 1
-@.str.5 = private unnamed_addr constant [15 x i8] c"testeChar: %c\0A\00", align 1
-@.str.6 = private unnamed_addr constant [14 x i8] c"testeVar: %d\0A\00", align 1
-@.str.7 = private unnamed_addr constant [12 x i8] c"testeF: %f\0A\00", align 1
-@.str.8 = private unnamed_addr constant [12 x i8] c"result: %d\0A\00", align 1
-@.str.9 = private unnamed_addr constant [7 x i8] c"i: %d\0A\00", align 1
-@.str.10 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
-@.str.11 = private unnamed_addr constant [3 x i8] c"%f\00", align 1
-@.str.12 = private unnamed_addr constant [4 x i8] c"\0A%c\00", align 1
-@.str.13 = private unnamed_addr constant [15 x i8] c"testeScan: %d\0A\00", align 1
-@.str.14 = private unnamed_addr constant [16 x i8] c"testeScan1: %f\0A\00", align 1
-@.str.15 = private unnamed_addr constant [16 x i8] c"testeScan2: %c\0A\00", align 1
+@.str.0 = private unnamed_addr constant [19 x i8] c"result é par: %d\0A\00", align 1
+@.str.1 = private unnamed_addr constant [35 x i8] c"result é par e multiplo de 3: %d\0A\00", align 1
+@.str.2 = private unnamed_addr constant [21 x i8] c"result é impar: %d\0A\00", align 1
+@.str.3 = private unnamed_addr constant [15 x i8] c"testeChar: %c\0A\00", align 1
+@.str.4 = private unnamed_addr constant [14 x i8] c"testeVar: %d\0A\00", align 1

@@ -21,8 +21,6 @@ char str_num[32];
 int lastLabel = 0;
 struct Pile *labelStack;
 int indentation = 1;
-int have_printf = 0;
-int have_scanf = 0;
 
 %}
 
@@ -41,6 +39,7 @@ int have_scanf = 0;
 %token TIMES
 %token LEFT
 %token RIGHT
+%token DONE
 %token <name> ID
 %token <name> STRING
 %token EQUALS
@@ -67,20 +66,28 @@ int have_scanf = 0;
 %token readCommand
 %token returnCommand
 
-%define parse.error verbose
-
 %type <doubleValue> expr term factor
 
 %type <intValue> logical_operations logical_expr else_command
 %%
 
-program:
-    declarations commands
-;
+program : block
+
+block : statement_list
+
+statement_list : statement | statement statement_list
+
+statement : declaration';' | command
+
+//program:
+//      %empty
+//    | declarations program
+//    | commands program
+//;
 
 declarations:
       %empty
-    | declarations declaration ';'
+    | declarations declaration
 ;
 
 declaration:
@@ -88,14 +95,14 @@ declaration:
       fprintf(fptr, "\t");
       char* temp = strdup($2);
       declareVariableAtTable(hashTable, $2, Int);
-      fprintf(fptr, "%%var%d = alloca i32, align 4\n", getSymbolTableValue(hashTable, temp).index);
+      fprintf(fptr, "%%var%d = alloca i32, align 4\n", getSymbolTableValue(hashTable, temp).index, temp);
       free(temp);
       }
     | FLOATtype ID {
       fprintf(fptr, "\t");
       char* temp = strdup($2);
       declareVariableAtTable(hashTable, $2, Float);
-      fprintf(fptr, "%%var%d = alloca float, align 4\n", getSymbolTableValue(hashTable, temp).index);
+      fprintf(fptr, "%%var%d = alloca float, align 4\n", getSymbolTableValue(hashTable, temp).index, temp);
       free(temp);
       }
     | BOOLEANtype ID {fprintf(fptr, "bool %s;\n", strdup($2)); declareVariableAtTable(hashTable, $2, Bool);}
@@ -115,10 +122,10 @@ commands:
 
 command:
       if_command
-    | atrib ';'
-    | read_command ';'
-    | write_command ';'
-    | return_command ';'
+    | atrib';'
+    | read_command';'
+    | write_command';'
+    | return_command';'
     | while_command
 ;
 
@@ -132,14 +139,14 @@ while_command:
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br i1 %%%d, label %%Label%d, label %%Label%d\n", lastTemp-1 + tempCounter, lastLabel+1, lastLabel);
       tempCounter += lastTemp;
-      lastTemp = 0;
+      lastTemp = 0; 
       pilePush(labelStack, lastLabel);
       lastLabel++;
       fprintf(fptr, "Label%d:\n", lastLabel++);
       indentation++;
-      } B_LEFT commands {
+      } B_LEFT commands {// printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation);
       tempCounter += lastTemp;
-      lastTemp = 0;
+      lastTemp = 0; 
       indentation--;
       } B_RIGHT {
       int temp = (int) popPile(labelStack);
@@ -157,28 +164,33 @@ return_command:
 }
 
 read_command:
-    readCommand LEFT read_value RIGHT {
-        have_scanf = 1;
+    readCommand LEFT ID RIGHT {
+        Symbol symb = getSymbolTableValue(hashTable, $3);
+        if(symb.Type == Int) {
+          int temp;
+          scanf("%d", &temp);
+          assignNumberValue(hashTable, $3, temp);
+        }
+        else if(symb.Type == Float) {
+          float temp;
+          scanf("%f", &temp);
+          assignNumberValue(hashTable, $3, temp);
+        }
+        else if(symb.Type == Char) {
+          char temp;
+          scanf("%c", &temp);
+          assignCharValue(hashTable, $3, temp);
+        }
+        else if(symb.Type == Bool) {
+          int temp;
+          scanf("%d", &temp);
+          assignNumberValue(hashTable, $3, temp);
+        }
     }
-;
-read_value: STRING COMMA '&'ID {
-    String temp;
-    Types type = parseString($1, &temp); /* Parseando para identificar o tipo da string */
-    if (type != TypeError){
-      for (int i = 0; i < indentation; i++) { fprintf(fptr, "\t"); }
-      char* aux;
-      aux = strdup($4);
-      fprintf(fptr, "%%%d = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str.%d, ptr noundef %%var%d)\n", tempCounter + lastTemp, stringsCount, getSymbolTableValue(hashTable, aux).index);
-      tempCounter++;
-      free(aux);
-      stringsEstaticas[stringsCount] = temp;
-      stringsCount++;
-    }
-}
 ;
 
 write_command:
-    writeCommand LEFT write_value RIGHT { have_printf = 1; }
+    writeCommand LEFT write_value RIGHT
 ;
 
 write_value:
@@ -236,7 +248,7 @@ atrib:
       ID EQUALS expr {
       printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation, getSymbolTableValue(hashTable, $1).Type);
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
-
+      
       switch (getSymbolTableValue(hashTable, $1).Type) {
       case Float:
         fprintf(fptr, "store float %s, ptr %%var%d, align 4;\n", tabelaTemp[lastTemp-1].result, getSymbolTableValue(hashTable, $1).index);
@@ -260,14 +272,14 @@ if_command:
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br i1 %%%d, label %%Label%d, label %%Label%d\n", lastTemp-1 + tempCounter, lastLabel+1, lastLabel);
       tempCounter += lastTemp;
-      lastTemp = 0;
+      lastTemp = 0; 
       pilePush(labelStack, lastLabel);
       lastLabel++;
       fprintf(fptr, "Label%d:\n", lastLabel++);
       indentation++;
       } B_LEFT commands {// printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation);
       tempCounter += lastTemp;
-      lastTemp = 0;
+      lastTemp = 0; 
       indentation--;
       } B_RIGHT  else_command
 ;
@@ -285,7 +297,10 @@ else_command:
       lastLabel++;
       }
     | %empty {
-    fprintf(fptr, "Label%d:\n", (int) popPile(labelStack));
+      int temp = (int) popPile(labelStack);
+      for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
+      fprintf(fptr, "br label %%Label%d\n\n", temp);
+      fprintf(fptr, "Label%d:\n", temp);
     }
 ;
 
@@ -389,7 +404,7 @@ logical_operations:
       sprintf(str_num, "%%%d", lastTemp + tempCounter);
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
-      }
+      } 
     | logical_operations GT expr {$$ = lastTemp;
       tabelaTemp[lastTemp].op = OP_GT;
       tabelaTemp[lastTemp].arg1 = $1;
@@ -397,7 +412,7 @@ logical_operations:
       sprintf(str_num, "%%%d", lastTemp + tempCounter);
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
-      }
+      } 
     | logical_operations GE expr  {$$ = lastTemp;
       tabelaTemp[lastTemp].op = OP_GE;
       tabelaTemp[lastTemp].arg1 = $1;
@@ -413,7 +428,7 @@ logical_operations:
       sprintf(str_num, "%%%d", lastTemp + tempCounter);
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
-      }
+      } 
     | logical_operations LE expr  {$$ = lastTemp;
       tabelaTemp[lastTemp].op = OP_LE;
       tabelaTemp[lastTemp].arg1 = $1;
@@ -455,7 +470,7 @@ logical_operations:
       lastTemp++;
     }
     | expr {$$ = $1;}
-;
+;   
 %%
 
 int yywrap( ) {
@@ -474,8 +489,7 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "Usage: %s <input-file>\n", argv[0]);
       return 1;
   }
-
-  yyin = fopen(argv[1], "r"); /* Abre o arquivo de entrada, posição zero é equivalente ao nome do programa executável. */
+  yyin = fopen(argv[1], "r");
   if (yyin == NULL) {
       fprintf(stderr, "Error opening file `%s`\n", argv[1]);
       return 1;
@@ -484,6 +498,20 @@ int main(int argc, char *argv[]) {
 
   // Open a file in writing mode
   fptr = fopen("saida.ll", "w");
+
+  // int c; copiar conteudo do codigo fonte para a saida.
+  // while ((c = fgetc(yyin)) != EOF)
+  // {
+  //     fputc(c, fptr);
+  // }
+  // fputc('\n', fptr);
+
+  // fclose(yyin);
+  // yyin = fopen(argv[1], "r");
+  // if (yyin == NULL) {
+  //     fprintf(stderr, "Error opening file `%s`\n", argv[1]);
+  //     return 1;
+  // }
 
   // Write some text to the file
   fprintf(fptr,"define i32 @main() {\nentry:\n");
@@ -507,14 +535,8 @@ int main(int argc, char *argv[]) {
 
 
   fprintf(fptr,"\n\n");
-  if (have_printf) {
-    fprintf(fptr,"\n\n");
-    fprintf(fptr,"declare i32 @printf(ptr noundef, ...) #1\n");
-  }
-  if (have_scanf) {
-    fprintf(fptr,"\n\n");
-    fprintf(fptr,"declare i32 @__isoc99_scanf(ptr noundef, ...) #1\n");
-  }
+  fprintf(fptr,"\n\n");
+  fprintf(fptr,"declare i32 @printf(ptr noundef, ...) #1\n");
   fprintf(fptr,"attributes #0 = { noinline nounwind optnone sspstrong uwtable \"frame-pointer\"=\"all\" \"min-legal-vector-width\"=\"0\" \"no-trapping-math\"=\"true\" \"stack-protector-buffer-size\"=\"8\" \"target-cpu\"=\"x86-64\" \"target-features\"=\"+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87\" \"tune-cpu\"=\"generic\" }\n");
   fprintf(fptr,"attributes #1 = { \"frame-pointer\"=\"all\" \"no-trapping-math\"=\"true\" \"stack-protector-buffer-size\"=\"8\" \"target-cpu\"=\"x86-64\" \"target-features\"=\"+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87\" \"tune-cpu\"=\"generic\" }\n");
 
@@ -523,9 +545,9 @@ int main(int argc, char *argv[]) {
             i, stringsEstaticas[i].size, stringsEstaticas[i].data);
     free(stringsEstaticas[i].data);
   }
-  fclose(fptr);
+  fclose(fptr); 
   destroyPile(labelStack);
-
+  
   printTempSymbTable(tabelaTemp, lastTemp);
   return 0;
 }
