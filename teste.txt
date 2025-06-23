@@ -6,6 +6,7 @@ int result;
 int testeScan;
 float testeScan1;
 char testeScan2;
+int teste;
 testeF = 2 * 2.5;
 testeChar = 'a';
 

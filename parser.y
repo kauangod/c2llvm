@@ -136,11 +136,9 @@ while_command:
       pilePush(labelStack, lastLabel);
       lastLabel++;
       fprintf(fptr, "Label%d:\n", lastLabel++);
-      indentation++;
       } B_LEFT commands {
       tempCounter += lastTemp;
       lastTemp = 0;
-      indentation--;
       } B_RIGHT {
       int temp = (int) popPile(labelStack);
       fprintf(fptr, "br label %%Label%d\n\n", (int) popPile(labelStack));
@@ -168,7 +166,8 @@ read_value: STRING COMMA '&'ID {
       for (int i = 0; i < indentation; i++) { fprintf(fptr, "\t"); }
       char* aux;
       aux = strdup($4);
-      fprintf(fptr, "%%%d = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str, ptr noundef %%var%d)\n", tempCounter + lastTemp, getSymbolTableValue(hashTable, aux).index);
+      fprintf(fptr, "%%%d = call i32 (ptr, ...) @__isoc99_scanf(ptr noundef @.str.%d, ptr noundef %%var%d)\n", tempCounter + lastTemp, stringsCount,getSymbolTableValue(hashTable, aux).index);
+      stringsEstaticas[stringsCount++] = temp;
       tempCounter++;
       free(aux);
     }
@@ -262,11 +261,9 @@ if_command:
       pilePush(labelStack, lastLabel);
       lastLabel++;
       fprintf(fptr, "Label%d:\n", lastLabel++);
-      indentation++;
       } B_LEFT commands {// printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation);
       tempCounter += lastTemp;
       lastTemp = 0;
-      indentation--;
       } B_RIGHT  else_command
 ;
 
@@ -275,9 +272,7 @@ else_command:
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br label %%Label%d\n\n", lastLabel);
       fprintf(fptr, "Label%d:\n", (int) popPile(labelStack));
-      indentation++;
       } B_LEFT commands B_RIGHT {
-      indentation--;
       fprintf(fptr, "br label %%Label%d\n\n", lastLabel);
       fprintf(fptr, "Label%d:\n", lastLabel);
       lastLabel++;
@@ -510,8 +505,7 @@ int main(int argc, char *argv[]) {
     fprintf(fptr,"declare i32 @printf(ptr noundef, ...) #1\n");
   }
   if (have_scanf) {
-    fprintf(fptr,"\n\n");
-    fprintf(fptr,"declare i32 @__isoc99_scanf(ptr noundef, ...) #1\n");
+    fprintf(fptr,"declare i32 @__isoc99_scanf(ptr noundef, ...) #1\n\n");
   }
   fprintf(fptr,"attributes #0 = { noinline nounwind optnone sspstrong uwtable \"frame-pointer\"=\"all\" \"min-legal-vector-width\"=\"0\" \"no-trapping-math\"=\"true\" \"stack-protector-buffer-size\"=\"8\" \"target-cpu\"=\"x86-64\" \"target-features\"=\"+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87\" \"tune-cpu\"=\"generic\" }\n");
   fprintf(fptr,"attributes #1 = { \"frame-pointer\"=\"all\" \"no-trapping-math\"=\"true\" \"stack-protector-buffer-size\"=\"8\" \"target-cpu\"=\"x86-64\" \"target-features\"=\"+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87\" \"tune-cpu\"=\"generic\" }\n");
