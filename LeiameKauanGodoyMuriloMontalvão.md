@@ -3,43 +3,53 @@
 ## BNF
 
 program:
-    declarations commands
+    block
 ;
 
-declarations:
-      %empty
-    | declarations declaration
+block:
+    statement_list
+;
+
+statement_list:
+    statement
+    | statement statement_list
+;
+
+statement:
+    declaration ';'
+    | command
 ;
 
 declaration:
-      INTtype ID
+    INTtype ID
     | FLOATtype ID
     | BOOLEANtype ID
     | CHARtype ID
 ;
 
-commands:
-      %empty
-    | commands command
-;
-
 command:
-      if_command
-    | atrib
-    | read_command
-    | write_command
-    | return_command
+    if_command
+    | atrib ';'
+    | read_command ';'
+    | write_command ';'
+    | return_command ';'
     | while_command
 ;
 
 while_command:
-    WHILE LEFT logical_expr RIGHT  B_LEFT commands  B_RIGHT
+    WHILE LEFT logical_expr RIGHT B_LEFT commands B_RIGHT
+;
 
 return_command:
     returnCommand expr
+;
 
 read_command:
-    readCommand LEFT ID RIGHT
+    readCommand LEFT read_value RIGHT
+;
+
+read_value:
+    STRING COMMA '&' ID
 ;
 
 write_command:
@@ -47,23 +57,24 @@ write_command:
 ;
 
 write_value:
-      STRING COMMA write_formats
+    STRING COMMA write_formats
     | STRING
 ;
 
 write_formats:
-        expr
+    expr
+;
 
 atrib:
-      ID EQUALS expr
+    ID EQUALS expr
 ;
 
 if_command:
-    IF LEFT logical_expr RIGHT  B_LEFT commands  B_RIGHT  else_command
+    IF LEFT logical_expr RIGHT B_LEFT commands B_RIGHT else_command
 ;
 
 else_command:
-      ELSE  B_LEFT commands B_RIGHT
+    ELSE B_LEFT commands B_RIGHT
     | %empty
 ;
 
@@ -72,19 +83,19 @@ logical_expr:
 ;
 
 expr:
-      expr PLUS term
+    expr PLUS term
     | expr MINUS term
     | term
 ;
 
 term:
-      term TIMES factor
+    term TIMES factor
     | term DIVIDE factor
     | factor
 ;
 
 factor:
-      DOUBLE
+    DOUBLE
     | INT
     | CHARACTER
     | ID
@@ -92,7 +103,7 @@ factor:
 ;
 
 logical_operations:
-      logical_operations AND logical_operations
+    logical_operations AND logical_operations
     | logical_operations OR logical_operations
     | logical_operations GT expr
     | logical_operations GE expr

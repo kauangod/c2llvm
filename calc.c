@@ -1,5 +1,5 @@
 #include "calc.h"
-#include "pilha.h"
+#include "stack.h"
 #include "utils.h"
 #include <stdbool.h>
 #include <stdio.h>

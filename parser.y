@@ -56,7 +56,6 @@ int have_scanf = 0;
 %token B_LEFT
 %token B_RIGHT
 %token COMMA
-%token IF
 %token ELSE
 %token WHILE
 %token INTtype
