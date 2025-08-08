@@ -1,13 +1,13 @@
 #ifndef CALC
 #define CALC
 #include "utils.h"
-#include "pilha.h"
+#include "stack.h"
 #include "ht.h"
 #include <stdlib.h>
 #include <stdio.h>
-void pushAtribEvent(struct EventPile *pile, char* name, double value);
-void popAtribEvent(struct EventPile* pile, ht* hashTable);
-void handleIfCommand(int boolean, int elseExists, struct EventPile* pile, ht* hashTable);
+void pushAtribEvent(struct EventStack *stack, char* name, double value);
+void popAtribEvent(struct EventStack* stack, ht* hashTable);
+void handleIfCommand(int boolean, int elseExists, struct EventStack* stack, ht* hashTable);
 double getNumberTableValue(ht *hashTable, char *name);
 Symbol getSymbolTableValue(ht *hashTable, char *name);
 char getCharTableValue(ht *hashTable, char *name);

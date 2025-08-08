@@ -72,7 +72,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "pilha.h"
+#include "stack.h"
 #include "utils.h"
 #include "ht.h"
 #include "calc.h"
@@ -89,7 +89,7 @@ int lastTemp = 0;
 int tempCounter = 0;
 char str_num[32];
 int lastLabel = 0;
-struct Pile *labelStack;
+struct Stack *labelStack;
 int indentation = 1;
 int have_printf = 0;
 int have_scanf = 0;
@@ -1269,13 +1269,13 @@ yyreduce:
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br label %%Label%d\n\n", lastLabel);
       fprintf(fptr, "Label%d:\n", lastLabel);
-      pilePush(labelStack, lastLabel++);
+      stackPush(labelStack, lastLabel++);
       printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation, Int);
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br i1 %%%d, label %%Label%d, label %%Label%d\n", lastTemp-1 + tempCounter, lastLabel+1, lastLabel);
       tempCounter += lastTemp;
-      lastTemp = 0; 
-      pilePush(labelStack, lastLabel);
+      lastTemp = 0;
+      stackPush(labelStack, lastLabel);
       lastLabel++;
       fprintf(fptr, "Label%d:\n", lastLabel++);
       }
@@ -1294,8 +1294,8 @@ yyreduce:
   case 22: /* while_command: WHILE LEFT logical_expr RIGHT $@1 B_LEFT commands $@2 B_RIGHT  */
 #line 145 "parser.y"
                 {
-      int temp = (int) popPile(labelStack);
-      fprintf(fptr, "br label %%Label%d\n\n", (int) popPile(labelStack));
+      int temp = (int) popStack(labelStack);
+      fprintf(fptr, "br label %%Label%d\n\n", (int) popStack(labelStack));
       fprintf(fptr, "Label%d:\n", temp);
       }
 #line 1302 "parser.tab.c"
@@ -1411,7 +1411,7 @@ yyreduce:
                      {
       printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation, getSymbolTableValue(hashTable, (yyvsp[-2].name)).Type);
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
-      
+
       switch (getSymbolTableValue(hashTable, (yyvsp[-2].name)).Type) {
       case Float:
         fprintf(fptr, "store float %s, ptr %%var%d, align 4;\n", tabelaTemp[lastTemp-1].result, getSymbolTableValue(hashTable, (yyvsp[-2].name)).index);
@@ -1437,8 +1437,8 @@ yyreduce:
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br i1 %%%d, label %%Label%d, label %%Label%d\n", lastTemp-1 + tempCounter, lastLabel+1, lastLabel);
       tempCounter += lastTemp;
-      lastTemp = 0; 
-      pilePush(labelStack, lastLabel);
+      lastTemp = 0;
+      stackPush(labelStack, lastLabel);
       lastLabel++;
       fprintf(fptr, "Label%d:\n", lastLabel++);
       }
@@ -1459,8 +1459,8 @@ yyreduce:
            {
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br label %%Label%d\n\n", lastLabel);
-      fprintf(fptr, "Label%d:\n", (int) popPile(labelStack));
-      pilePush(labelStack, lastLabel);
+      fprintf(fptr, "Label%d:\n", (int) popStack(labelStack));
+      stackPush(labelStack, lastLabel);
       lastLabel++;
       }
 #line 1467 "parser.tab.c"
@@ -1469,7 +1469,7 @@ yyreduce:
   case 35: /* else_command: ELSE $@5 B_LEFT commands B_RIGHT  */
 #line 280 "parser.y"
                                 {
-      int temp = (int) popPile(labelStack);
+      int temp = (int) popStack(labelStack);
       fprintf(fptr, "br label %%Label%d\n\n", temp);
       fprintf(fptr, "Label%d:\n", temp);
       }
@@ -1479,7 +1479,7 @@ yyreduce:
   case 36: /* else_command: %empty  */
 #line 285 "parser.y"
              {
-      int temp = (int) popPile(labelStack);
+      int temp = (int) popStack(labelStack);
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br label %%Label%d\n\n", temp);
       fprintf(fptr, "Label%d:\n", temp);
@@ -1998,7 +1998,7 @@ int main(int argc, char *argv[]) {
   // Write some text to the file
   fprintf(fptr,"define i32 @main() {\nentry:\n");
 
-  labelStack = createPile();
+  labelStack = createStack();
   hashTable = ht_create();
   yyparse();
 
@@ -2032,9 +2032,9 @@ int main(int argc, char *argv[]) {
             i, stringsEstaticas[i].size, stringsEstaticas[i].data);
     free(stringsEstaticas[i].data);
   }
-  fclose(fptr); 
-  destroyPile(labelStack);
-  
+  fclose(fptr);
+  destroyStack(labelStack);
+
   printTempSymbTable(tabelaTemp, lastTemp);
   return 0;
 }

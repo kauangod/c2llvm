@@ -5,21 +5,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void pushAtribEvent(struct EventPile *pile, char *name, double value) {
+void pushAtribEvent(struct EventStack *stack, char *name, double value) {
   // printf("Tá colocando %f em %s .\n", value, name);
   struct Event temp;
   temp.isAtrib = 1;
   strcpy(temp.name, name);
   temp.value.doubleValue = value;
-  eventPilePush(pile, temp);
+  eventStackPush(stack, temp);
 }
 
-void popAtribEvent(struct EventPile *pile, ht *hashTable) {
+void popAtribEvent(struct EventStack *stack, ht *hashTable) {
   struct Event temp;
-  if (pile->size > 0) {
-    printf("Evento %s, %d, %f.\n", topEventPile(pile).name,
-           topEventPile(pile).isAtrib, topEventPile(pile).value.doubleValue);
-    temp = popEventPile(pile);
+  if (stack->size > 0) {
+    printf("Evento %s, %d, %f.\n", topEventStack(stack).name,
+           topEventStack(stack).isAtrib, topEventStack(stack).value.doubleValue);
+    temp = popEventStack(stack);
     if (temp.isAtrib) {
       double *tt = malloc(sizeof(double));
       *tt = temp.value.doubleValue;
@@ -28,18 +28,18 @@ void popAtribEvent(struct EventPile *pile, ht *hashTable) {
   }
 }
 
-void handleIfCommand(int boolean, int elseExists, struct EventPile *pile,
+void handleIfCommand(int boolean, int elseExists, struct EventStack *stack,
                      ht *hashTable) {
-  // printEventPile(pile);
+  // printEventStack(stack);
   struct Event temp;
-  if (!pile || pile->size <= 0)
+  if (!stack || stack->size <= 0)
     return;
   if (!boolean && elseExists) {
-    popAtribEvent(pile, hashTable);
+    popAtribEvent(stack, hashTable);
     return;
   }
-  popEventPile(pile);
-  popAtribEvent(pile, hashTable);
+  popEventStack(stack);
+  popAtribEvent(stack, hashTable);
   return;
 }
 

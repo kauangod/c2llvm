@@ -7,8 +7,8 @@ BINARIES := $(LLFILES:.ll=)
 all: tinycompiler $(BINARIES)
 
 # Compilar o tinycompiler
-tinycompiler: calc.c lex.yy.c parser.tab.c pilha.c ht.c
-	gcc -o tinycompiler calc.c lex.yy.c parser.tab.c pilha.c ht.c -lfl
+tinycompiler: calc.c lex.yy.c parser.tab.c stack.c ht.c
+	gcc -o tinycompiler calc.c lex.yy.c parser.tab.c stack.c ht.c -lfl
 
 # Etapa 1: Compilar .txt para .ll
 $(DIR)%.ll: $(DIR)%.txt tinycompiler

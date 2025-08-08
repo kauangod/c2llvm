@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "pilha.h"
+#include "stack.h"
 #include "utils.h"
 #include "ht.h"
 #include "calc.h"
@@ -19,7 +19,7 @@ int lastTemp = 0;
 int tempCounter = 0;
 char str_num[32];
 int lastLabel = 0;
-struct Pile *labelStack;
+struct Stack *labelStack;
 int indentation = 1;
 int have_printf = 0;
 int have_scanf = 0;
@@ -41,7 +41,6 @@ int have_scanf = 0;
 %token TIMES
 %token LEFT
 %token RIGHT
-%token DONE
 %token <name> ID
 %token <name> STRING
 %token EQUALS
@@ -130,21 +129,21 @@ while_command:
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br label %%Label%d\n\n", lastLabel);
       fprintf(fptr, "Label%d:\n", lastLabel);
-      pilePush(labelStack, lastLabel++);
+      stackPush(labelStack, lastLabel++);
       printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation, Int);
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br i1 %%%d, label %%Label%d, label %%Label%d\n", lastTemp-1 + tempCounter, lastLabel+1, lastLabel);
       tempCounter += lastTemp;
-      lastTemp = 0; 
-      pilePush(labelStack, lastLabel);
+      lastTemp = 0;
+      stackPush(labelStack, lastLabel);
       lastLabel++;
       fprintf(fptr, "Label%d:\n", lastLabel++);
       } B_LEFT commands {
       tempCounter += lastTemp;
       lastTemp = 0;
       } B_RIGHT {
-      int temp = (int) popPile(labelStack);
-      fprintf(fptr, "br label %%Label%d\n\n", (int) popPile(labelStack));
+      int temp = (int) popStack(labelStack);
+      fprintf(fptr, "br label %%Label%d\n\n", (int) popStack(labelStack));
       fprintf(fptr, "Label%d:\n", temp);
       }
 
@@ -236,7 +235,7 @@ atrib:
       ID EQUALS expr {
       printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation, getSymbolTableValue(hashTable, $1).Type);
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
-      
+
       switch (getSymbolTableValue(hashTable, $1).Type) {
       case Float:
         fprintf(fptr, "store float %s, ptr %%var%d, align 4;\n", tabelaTemp[lastTemp-1].result, getSymbolTableValue(hashTable, $1).index);
@@ -260,8 +259,8 @@ if_command:
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br i1 %%%d, label %%Label%d, label %%Label%d\n", lastTemp-1 + tempCounter, lastLabel+1, lastLabel);
       tempCounter += lastTemp;
-      lastTemp = 0; 
-      pilePush(labelStack, lastLabel);
+      lastTemp = 0;
+      stackPush(labelStack, lastLabel);
       lastLabel++;
       fprintf(fptr, "Label%d:\n", lastLabel++);
       } B_LEFT commands {// printTempSymbTableToFile(fptr, tabelaTemp, lastTemp, indentation);
@@ -274,16 +273,16 @@ else_command:
       ELSE {
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br label %%Label%d\n\n", lastLabel);
-      fprintf(fptr, "Label%d:\n", (int) popPile(labelStack));
-      pilePush(labelStack, lastLabel);
+      fprintf(fptr, "Label%d:\n", (int) popStack(labelStack));
+      stackPush(labelStack, lastLabel);
       lastLabel++;
       } B_LEFT commands B_RIGHT {
-      int temp = (int) popPile(labelStack);
+      int temp = (int) popStack(labelStack);
       fprintf(fptr, "br label %%Label%d\n\n", temp);
       fprintf(fptr, "Label%d:\n", temp);
       }
     | %empty {
-      int temp = (int) popPile(labelStack);
+      int temp = (int) popStack(labelStack);
       for(int i =0; i < indentation; i++) fprintf(fptr, "\t");
       fprintf(fptr, "br label %%Label%d\n\n", temp);
       fprintf(fptr, "Label%d:\n", temp);
@@ -390,7 +389,7 @@ logical_operations:
       sprintf(str_num, "%%%d", lastTemp + tempCounter);
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
-      } 
+      }
     | logical_operations GT expr {$$ = lastTemp;
       tabelaTemp[lastTemp].op = OP_GT;
       tabelaTemp[lastTemp].arg1 = $1;
@@ -398,7 +397,7 @@ logical_operations:
       sprintf(str_num, "%%%d", lastTemp + tempCounter);
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
-      } 
+      }
     | logical_operations GE expr  {$$ = lastTemp;
       tabelaTemp[lastTemp].op = OP_GE;
       tabelaTemp[lastTemp].arg1 = $1;
@@ -414,7 +413,7 @@ logical_operations:
       sprintf(str_num, "%%%d", lastTemp + tempCounter);
       strcpy(tabelaTemp[lastTemp].result, str_num);
       lastTemp++;
-      } 
+      }
     | logical_operations LE expr  {$$ = lastTemp;
       tabelaTemp[lastTemp].op = OP_LE;
       tabelaTemp[lastTemp].arg1 = $1;
@@ -456,7 +455,7 @@ logical_operations:
       lastTemp++;
     }
     | expr {$$ = $1;}
-;   
+;
 %%
 
 int yywrap( ) {
@@ -505,7 +504,7 @@ int main(int argc, char *argv[]) {
   // Write some text to the file
   fprintf(fptr,"define i32 @main() {\nentry:\n");
 
-  labelStack = createPile();
+  labelStack = createStack();
   hashTable = ht_create();
   yyparse();
 
@@ -539,9 +538,9 @@ int main(int argc, char *argv[]) {
             i, stringsEstaticas[i].size, stringsEstaticas[i].data);
     free(stringsEstaticas[i].data);
   }
-  fclose(fptr); 
-  destroyPile(labelStack);
-  
+  fclose(fptr);
+  destroyStack(labelStack);
+
   printTempSymbTable(tabelaTemp, lastTemp);
   return 0;
 }
